@@ -6,6 +6,8 @@ import {
   forwardRef,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
 import { HumanMessage } from "@langchain/core/messages";
 import type { CompiledStateGraph } from "@langchain/langgraph";
 import { PrismaService } from "../../common/prisma/prisma.service";
@@ -16,6 +18,12 @@ import { buildSDRGraph, type SDRNodeFactory } from "./graph/sdr.graph";
 import { createConsentCheckNode } from "./graph/nodes/consent-check.node";
 import { createGreetNode } from "./graph/nodes/greet.node";
 import { createQualifyNode } from "./graph/nodes/qualify.node";
+import { createEthicsGuardNode } from "./graph/nodes/ethics-guard.node";
+import { createOperatingHoursNode } from "./graph/nodes/operating-hours.node";
+import { createEmergencyDetectNode } from "./graph/nodes/emergency-detect.node";
+import { createObjectionNode } from "./graph/nodes/handle-objection.node";
+import { createLoopGuardNode } from "./graph/nodes/loop-guard.node";
+import { createHandoffNode } from "./graph/nodes/human-handoff.node";
 import { buildConsentPrompt } from "./prompts/system.prompt";
 import type { SDRState, AgentConfigState } from "./graph/sdr.state";
 
@@ -42,6 +50,8 @@ export class AgentService implements OnModuleInit {
     @Inject(forwardRef(() => WhatsappService))
     private readonly whatsappService: WhatsappService,
     private readonly configService: ConfigService,
+    @InjectQueue("notifications")
+    private readonly notificationsQueue: Queue,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -57,10 +67,18 @@ export class AgentService implements OnModuleInit {
       consentCheckNode: createConsentCheckNode(this.lgpdService),
       greetNode: createGreetNode(),
       qualifyNode: createQualifyNode(),
+      ethicsGuardNode: createEthicsGuardNode(),
+      operatingHoursNode: createOperatingHoursNode(),
+      emergencyDetectNode: createEmergencyDetectNode(),
+      objectionNode: createObjectionNode(),
+      loopGuardNode: createLoopGuardNode(),
+      handoffNode: createHandoffNode(this.prisma, this.notificationsQueue),
     };
 
     this.compiledGraph = buildSDRGraph(checkpointer, nodes);
-    this.logger.log("SDR graph compiled with Redis checkpointer");
+    this.logger.log(
+      "SDR graph compiled with 9 nodes (3 core + 6 guardrails) and Redis checkpointer",
+    );
   }
 
   /**
@@ -154,14 +172,24 @@ export class AgentService implements OnModuleInit {
       const consentMsg = buildConsentPrompt(agentConfig.personaName);
       await this.whatsappService.sendText(instanceName, remoteJid, consentMsg);
       this.logger.log(`Sent LGPD consent request to ${remoteJid}`);
-    } else if (
-      replyText &&
-      !result.humanHandoffRequested
-    ) {
+    } else if (result.qualificationStage === "handoff") {
+      // Human handoff — the handoff node already generated the message and updated DB
+      // Just send the handoff message via WhatsApp, do NOT continue processing
+      if (replyText) {
+        await this.whatsappService.sendText(
+          instanceName,
+          remoteJid,
+          replyText,
+        );
+      }
+      this.logger.log(
+        `Human handoff triggered for ${remoteJid} (thread: ${threadId})`,
+      );
+    } else if (replyText && !result.humanHandoffRequested) {
       // Send AI reply via WhatsApp outbound queue
       await this.whatsappService.sendText(instanceName, remoteJid, replyText);
       this.logger.log(
-        `Sent AI reply to ${remoteJid} (stage: ${result.qualificationStage})`,
+        `Sent AI reply to ${remoteJid} (stage: ${result.qualificationStage}, ethicsBlocked: ${result.ethicsBlocked})`,
       );
     }
 
