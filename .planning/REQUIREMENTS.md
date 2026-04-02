@@ -161,13 +161,89 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| *(populated during roadmap creation)* | | |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| LGPD-01 | Phase 1 | Pending |
+| LGPD-02 | Phase 1 | Pending |
+| LGPD-03 | Phase 1 | Pending |
+| LGPD-04 | Phase 1 | Pending |
+| WHATS-01 | Phase 2 | Pending |
+| WHATS-02 | Phase 2 | Pending |
+| WHATS-03 | Phase 2 | Pending |
+| WHATS-04 | Phase 2 | Pending |
+| WHATS-05 | Phase 2 | Pending |
+| WHATS-06 | Phase 2 | Pending |
+| WHATS-07 | Phase 2 | Pending |
+| AGENT-01 | Phase 2 | Pending |
+| AGENT-02 | Phase 2 | Pending |
+| AGENT-03 | Phase 2 | Pending |
+| AGENT-04 | Phase 2 | Pending |
+| AGENT-05 | Phase 2 | Pending |
+| AGENT-06 | Phase 2 | Pending |
+| AGENT-07 | Phase 2 | Pending |
+| AGENT-08 | Phase 2 | Pending |
+| AGENT-09 | Phase 2 | Pending |
+| AGENT-10 | Phase 2 | Pending |
+| CRM-01 | Phase 3 | Pending |
+| CRM-02 | Phase 3 | Pending |
+| CRM-03 | Phase 3 | Pending |
+| CRM-04 | Phase 3 | Pending |
+| CRM-05 | Phase 3 | Pending |
+| CRM-06 | Phase 3 | Pending |
+| CRM-07 | Phase 3 | Pending |
+| HAND-01 | Phase 3 | Pending |
+| HAND-02 | Phase 3 | Pending |
+| HAND-03 | Phase 3 | Pending |
+| HAND-04 | Phase 3 | Pending |
+| SCHED-01 | Phase 3 | Pending |
+| SCHED-02 | Phase 3 | Pending |
+| SCHED-03 | Phase 3 | Pending |
+| SCHED-04 | Phase 3 | Pending |
+| SCHED-05 | Phase 3 | Pending |
+| SCHED-06 | Phase 3 | Pending |
+| SCHED-07 | Phase 3 | Pending |
+| DASH-01 | Phase 4 | Pending |
+| DASH-02 | Phase 4 | Pending |
+| DASH-03 | Phase 4 | Pending |
+| DASH-04 | Phase 4 | Pending |
+| DASH-05 | Phase 4 | Pending |
+| DASH-06 | Phase 4 | Pending |
+| DASH-07 | Phase 4 | Pending |
+| DASH-08 | Phase 4 | Pending |
+| DASH-09 | Phase 4 | Pending |
+| SET-01 | Phase 4 | Pending |
+| SET-02 | Phase 4 | Pending |
+| SET-03 | Phase 4 | Pending |
+| SET-04 | Phase 4 | Pending |
+| SET-05 | Phase 4 | Pending |
+| SET-06 | Phase 4 | Pending |
+| NOTIF-01 | Phase 5 | Pending |
+| NOTIF-02 | Phase 5 | Pending |
+| NOTIF-03 | Phase 5 | Pending |
+| NOTIF-04 | Phase 5 | Pending |
+| NOTIF-05 | Phase 5 | Pending |
+| FOLLOW-01 | Phase 5 | Pending |
+| FOLLOW-02 | Phase 5 | Pending |
+| FOLLOW-03 | Phase 5 | Pending |
+| FOLLOW-04 | Phase 5 | Pending |
+| HOOK-01 | Phase 5 | Pending |
+| HOOK-02 | Phase 5 | Pending |
+| HOOK-03 | Phase 5 | Pending |
+| HOOK-04 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 60 total
-- Mapped to phases: 0
-- Unmapped: 60 ⚠️
+- v1 requirements: 77 total (recount from file — original estimate of 60 was incorrect)
+- Mapped to phases: 77
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after initial definition*
+*Last updated: 2026-04-02 after roadmap creation — all requirements mapped*
