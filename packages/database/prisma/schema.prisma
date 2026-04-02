@@ -106,6 +106,11 @@ model Organization {
   agentConfig      AgentConfig?
   conversations    Conversation[]
 
+  // CRM & Scheduling
+  leads          Lead[]
+  calendarTokens CalendarToken[]
+  appointments   Appointment[]
+
   @@unique([slug])
   @@map("organization")
 }
@@ -247,7 +252,111 @@ model Conversation {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  // CRM reverse relation
+  lead Lead?
+
   @@unique([organizationId, remoteJid])
   @@index([organizationId, status])
   @@map("conversations")
+}
+
+// ============================================================
+// CRM & Scheduling models (Phase 3)
+// ============================================================
+
+/// Lead card in the CRM pipeline. Deduplicated by org + phone.
+model Lead {
+  id                String   @id @default(uuid()) @db.Uuid
+  organizationId    String   @map("organization_id")
+  phone             String
+  name              String?
+  email             String?
+  stage             String   @default("novo")
+  source            String   @default("whatsapp")
+  procedureInterest String?  @map("procedure_interest")
+  score             Int      @default(0)
+  tags              String[]
+  conversationId    String?  @unique @map("conversation_id") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  annotations  LeadAnnotation[]
+  appointments Appointment[]
+  timeline     LeadTimeline[]
+
+  @@unique([organizationId, phone])
+  @@index([organizationId, stage])
+  @@index([organizationId, createdAt])
+  @@map("leads")
+}
+
+/// AI-generated or human-created annotations on a lead.
+model LeadAnnotation {
+  id        String   @id @default(uuid()) @db.Uuid
+  leadId    String   @map("lead_id") @db.Uuid
+  type      String   // summary | objection | next_steps | note
+  content   String
+  createdBy String   @default("ai") @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("lead_annotations")
+}
+
+/// Timeline events for a lead (stage changes, interactions, etc).
+model LeadTimeline {
+  id          String   @id @default(uuid()) @db.Uuid
+  leadId      String   @map("lead_id") @db.Uuid
+  eventType   String   @map("event_type")
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@map("lead_timeline")
+}
+
+/// Calendar OAuth tokens for Google Calendar integration.
+model CalendarToken {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @map("organization_id")
+  professionalId String?  @map("professional_id")
+  calendarId     String   @map("calendar_id")
+  refreshToken   String   @map("refresh_token")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, professionalId])
+  @@map("calendar_tokens")
+}
+
+/// Scheduled appointments linked to leads and calendar events.
+model Appointment {
+  id              String   @id @default(uuid()) @db.Uuid
+  organizationId  String   @map("organization_id")
+  leadId          String   @map("lead_id") @db.Uuid
+  calendarEventId String   @map("calendar_event_id")
+  calendarId      String   @map("calendar_id")
+  startAt         DateTime @map("start_at")
+  endAt           DateTime @map("end_at")
+  status          String   @default("tentative")
+  procedureName   String?  @map("procedure_name")
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lead         Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, startAt])
+  @@index([leadId])
+  @@map("appointments")
 }

@@ -17,6 +17,7 @@ import { TenantsModule } from "./modules/tenants/tenants.module";
 import { UsersModule } from "./modules/users/users.module";
 import { WhatsappModule } from "./modules/whatsapp/whatsapp.module";
 import { AgentModule } from "./modules/agent/agent.module";
+import { CrmModule } from "./modules/crm/crm.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -62,6 +63,7 @@ function validateEnv(config: Record<string, unknown>) {
     UsersModule,
     WhatsappModule,
     AgentModule,
+    CrmModule,
   ],
   controllers: [AppController],
   providers: [
