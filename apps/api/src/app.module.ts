@@ -15,6 +15,7 @@ import { TenantGuard } from "./common/tenant/tenant.guard";
 import { LgpdModule } from "./modules/lgpd/lgpd.module";
 import { TenantsModule } from "./modules/tenants/tenants.module";
 import { UsersModule } from "./modules/users/users.module";
+import { WhatsappModule } from "./modules/whatsapp/whatsapp.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -24,6 +25,9 @@ const envSchema = z.object({
   WEB_URL: z.string().url().optional(),
   PORT: z.coerce.number().default(3001),
   PGCRYPTO_KEY: z.string().optional(),
+  EVOLUTION_API_URL: z.string().url().optional(),
+  EVOLUTION_API_KEY: z.string().optional(),
+  WEBHOOK_BASE_URL: z.string().url().optional(),
 });
 
 function validateEnv(config: Record<string, unknown>) {
@@ -54,6 +58,7 @@ function validateEnv(config: Record<string, unknown>) {
     LgpdModule,
     TenantsModule,
     UsersModule,
+    WhatsappModule,
   ],
   controllers: [AppController],
   providers: [
