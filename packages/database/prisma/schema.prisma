@@ -7,13 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Placeholder model — full schema defined in Plan 02
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  ATTENDANT
+}
+
 model Clinic {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String   @unique
+  timezone      String   @default("America/Sao_Paulo")
+  retentionDays Int      @default(365) @map("retention_days")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  users           User[]
+  consentRecords  ConsentRecord[]
+  erasureRequests ErasureRequest[]
+
+  @@map("clinics")
+}
+
+model User {
+  id       String   @id @default(uuid()) @db.Uuid
+  clinicId String   @map("clinic_id") @db.Uuid
+  email    String
+  name     String
+  role     UserRole @default(ATTENDANT)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("clinics")
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, email])
+  @@map("users")
+}
+
+model ConsentRecord {
+  id              String   @id @default(uuid()) @db.Uuid
+  clinicId        String   @map("clinic_id") @db.Uuid
+  leadPhone       String   @map("lead_phone")
+  consentGiven    Boolean  @map("consent_given")
+  consentVersion  String   @map("consent_version")
+  consentChannel  String   @map("consent_channel")
+  consentMessage  String   @map("consent_message")
+  ipAddress       String?  @map("ip_address")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@index([clinicId, createdAt])
+  @@map("consent_records")
+}
+
+model ErasureRequest {
+  id          String    @id @default(uuid()) @db.Uuid
+  clinicId    String    @map("clinic_id") @db.Uuid
+  leadPhone   String    @map("lead_phone")
+  requestedAt DateTime  @default(now()) @map("requested_at")
+  processedAt DateTime? @map("processed_at")
+  status      String    @default("pending")
+
+  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@map("erasure_requests")
 }

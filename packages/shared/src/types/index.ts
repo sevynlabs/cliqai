@@ -22,3 +22,5 @@ export interface User extends BaseEntity {
   role: UserRole;
   clinicId: string;
 }
+
+export * from "./lgpd";
