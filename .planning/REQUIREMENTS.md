@@ -36,12 +36,12 @@
 - [ ] **AGENT-01**: LangGraph-based agent with state machine, memory (Redis checkpointer), and tool-calling
 - [ ] **AGENT-02**: Configurable persona per clinic (name, tone, specialty vocabulary, emoji usage)
 - [ ] **AGENT-03**: BANT qualification flow via natural conversation (Budget, Authority, Need, Timeline)
-- [ ] **AGENT-04**: Objection handling for common objections (price, fear, timing, "send me info")
-- [ ] **AGENT-05**: Agent NEVER provides medical diagnosis or promises specific procedure results
-- [ ] **AGENT-06**: Agent respects operating hours (configurable per clinic, default 8h-20h)
-- [ ] **AGENT-07**: Max conversation turns before human handoff (configurable, default 20)
-- [ ] **AGENT-08**: Emergency escalation detection (medical emergencies, complaints, legal requests)
-- [ ] **AGENT-09**: Loop guard with max-turn limits and fallback to human handoff
+- [x] **AGENT-04**: Objection handling for common objections (price, fear, timing, "send me info")
+- [x] **AGENT-05**: Agent NEVER provides medical diagnosis or promises specific procedure results
+- [x] **AGENT-06**: Agent respects operating hours (configurable per clinic, default 8h-20h)
+- [x] **AGENT-07**: Max conversation turns before human handoff (configurable, default 20)
+- [x] **AGENT-08**: Emergency escalation detection (medical emergencies, complaints, legal requests)
+- [x] **AGENT-09**: Loop guard with max-turn limits and fallback to human handoff
 - [ ] **AGENT-10**: LGPD consent collection as first interaction before any data storage
 
 ### CRM
@@ -185,12 +185,12 @@
 | AGENT-01 | Phase 2 | Pending |
 | AGENT-02 | Phase 2 | Pending |
 | AGENT-03 | Phase 2 | Pending |
-| AGENT-04 | Phase 2 | Pending |
-| AGENT-05 | Phase 2 | Pending |
-| AGENT-06 | Phase 2 | Pending |
-| AGENT-07 | Phase 2 | Pending |
-| AGENT-08 | Phase 2 | Pending |
-| AGENT-09 | Phase 2 | Pending |
+| AGENT-04 | Phase 2 | Complete |
+| AGENT-05 | Phase 2 | Complete |
+| AGENT-06 | Phase 2 | Complete |
+| AGENT-07 | Phase 2 | Complete |
+| AGENT-08 | Phase 2 | Complete |
+| AGENT-09 | Phase 2 | Complete |
 | AGENT-10 | Phase 2 | Pending |
 | CRM-01 | Phase 3 | Pending |
 | CRM-02 | Phase 3 | Pending |
