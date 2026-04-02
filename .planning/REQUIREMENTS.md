@@ -7,10 +7,10 @@
 
 ### Foundation
 
-- [ ] **FOUND-01**: System uses TypeScript monorepo (Next.js 16 frontend + NestJS backend + shared types)
+- [x] **FOUND-01**: System uses TypeScript monorepo (Next.js 16 frontend + NestJS backend + shared types)
 - [ ] **FOUND-02**: PostgreSQL database with multi-tenant row-level security from migration 0001
-- [ ] **FOUND-03**: Redis for caching, sessions, BullMQ queues, and LangGraph checkpointer
-- [ ] **FOUND-04**: Docker Compose for local development environment
+- [x] **FOUND-03**: Redis for caching, sessions, BullMQ queues, and LangGraph checkpointer
+- [x] **FOUND-04**: Docker Compose for local development environment
 
 ### Authentication & Multi-Tenancy
 
@@ -161,10 +161,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Pending |
 | AUTH-02 | Phase 1 | Pending |
 | AUTH-03 | Phase 1 | Pending |
