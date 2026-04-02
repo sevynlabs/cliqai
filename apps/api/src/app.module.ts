@@ -13,6 +13,8 @@ import { RbacGuard } from "./common/auth/rbac.guard";
 import { TenantMiddleware } from "./common/tenant/tenant.middleware";
 import { TenantGuard } from "./common/tenant/tenant.guard";
 import { LgpdModule } from "./modules/lgpd/lgpd.module";
+import { TenantsModule } from "./modules/tenants/tenants.module";
+import { UsersModule } from "./modules/users/users.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -50,6 +52,8 @@ function validateEnv(config: Record<string, unknown>) {
     AuthModule,
     HealthModule,
     LgpdModule,
+    TenantsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
