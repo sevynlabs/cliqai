@@ -8,7 +8,7 @@
 ### Foundation
 
 - [x] **FOUND-01**: System uses TypeScript monorepo (Next.js 16 frontend + NestJS backend + shared types)
-- [ ] **FOUND-02**: PostgreSQL database with multi-tenant row-level security from migration 0001
+- [x] **FOUND-02**: PostgreSQL database with multi-tenant row-level security from migration 0001
 - [x] **FOUND-03**: Redis for caching, sessions, BullMQ queues, and LangGraph checkpointer
 - [x] **FOUND-04**: Docker Compose for local development environment
 
@@ -19,7 +19,7 @@
 - [ ] **AUTH-03**: User can reset password via email link
 - [ ] **AUTH-04**: Clinic owner can invite users with roles (admin, manager, attendant)
 - [ ] **AUTH-05**: RBAC enforces permissions per role (owner full access, attendant conversations only)
-- [ ] **AUTH-06**: All data queries are tenant-scoped (no cross-clinic data leakage)
+- [x] **AUTH-06**: All data queries are tenant-scoped (no cross-clinic data leakage)
 
 ### WhatsApp Integration
 
@@ -109,10 +109,10 @@
 
 ### Compliance
 
-- [ ] **LGPD-01**: Consent collected and logged before any personal data processing
-- [ ] **LGPD-02**: Right to erasure — complete data deletion upon lead request
-- [ ] **LGPD-03**: Data retention policy with configurable retention periods
-- [ ] **LGPD-04**: PII encrypted at rest (pgcrypto)
+- [x] **LGPD-01**: Consent collected and logged before any personal data processing
+- [x] **LGPD-02**: Right to erasure — complete data deletion upon lead request
+- [x] **LGPD-03**: Data retention policy with configurable retention periods
+- [x] **LGPD-04**: PII encrypted at rest (pgcrypto)
 
 ### Webhooks
 
@@ -162,7 +162,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Pending |
@@ -170,11 +170,11 @@
 | AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Pending |
 | AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
-| LGPD-01 | Phase 1 | Pending |
-| LGPD-02 | Phase 1 | Pending |
-| LGPD-03 | Phase 1 | Pending |
-| LGPD-04 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
+| LGPD-01 | Phase 1 | Complete |
+| LGPD-02 | Phase 1 | Complete |
+| LGPD-03 | Phase 1 | Complete |
+| LGPD-04 | Phase 1 | Complete |
 | WHATS-01 | Phase 2 | Pending |
 | WHATS-02 | Phase 2 | Pending |
 | WHATS-03 | Phase 2 | Pending |
