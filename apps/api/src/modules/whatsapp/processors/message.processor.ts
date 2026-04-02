@@ -83,6 +83,16 @@ export class MessageProcessor extends WorkerHost {
       conversation.id,
     );
 
+    // HAND-04: Check Redis mutex — if human is handling, skip AI
+    const mutexKey = `mutex:conversation:${tenantId}:${key.remoteJid}`;
+    const mutexHolder = await this.redis.get(mutexKey);
+    if (mutexHolder) {
+      this.logger.log(
+        `Skipping AI for ${key.remoteJid} — mutex held by: ${mutexHolder}`,
+      );
+      return;
+    }
+
     this.logger.log(
       `Processing message from ${key.remoteJid} for tenant ${tenantId}: "${textContent.substring(0, 50)}..."`,
     );

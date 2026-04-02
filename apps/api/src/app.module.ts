@@ -18,6 +18,7 @@ import { UsersModule } from "./modules/users/users.module";
 import { WhatsappModule } from "./modules/whatsapp/whatsapp.module";
 import { AgentModule } from "./modules/agent/agent.module";
 import { CrmModule } from "./modules/crm/crm.module";
+import { SchedulingModule } from "./modules/scheduling/scheduling.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -31,6 +32,9 @@ const envSchema = z.object({
   EVOLUTION_API_KEY: z.string().optional(),
   WEBHOOK_BASE_URL: z.string().url().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_REDIRECT_URI: z.string().url().optional(),
 });
 
 function validateEnv(config: Record<string, unknown>) {
@@ -64,6 +68,7 @@ function validateEnv(config: Record<string, unknown>) {
     WhatsappModule,
     AgentModule,
     CrmModule,
+    SchedulingModule,
   ],
   controllers: [AppController],
   providers: [
