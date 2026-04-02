@@ -28,12 +28,13 @@ CliniqAI is built in five phases, each delivering a complete vertical slice. Pha
   3. An attendant cannot access owner-only routes or another clinic's data (RBAC enforced at API level)
   4. LGPD consent schema exists — no lead record can be created without a `consent_given = true` record
   5. A developer can run `docker compose up` and reach a working local environment with all services
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Monorepo scaffold (pnpm workspace, Next.js 16 + NestJS apps, shared packages, Docker Compose)
-- [ ] 01-02: PostgreSQL schema with RLS, Redis/BullMQ setup, multi-tenant middleware
-- [ ] 01-03: Auth (Better Auth), RBAC guards, LGPD consent data model
+- [ ] 01-01-PLAN.md — Monorepo scaffold (pnpm workspace, Next.js 16 + NestJS apps, shared packages, Docker Compose)
+- [ ] 01-02-PLAN.md — PostgreSQL schema with RLS, pgcrypto PII encryption, Redis/BullMQ setup, multi-tenant middleware, LGPD consent model
+- [ ] 01-03-PLAN.md — Auth backend (Better Auth config, RBAC guards, tenant middleware upgrade, clinic/user endpoints)
+- [ ] 01-04-PLAN.md — Auth frontend (Next.js auth pages, auth client, protected dashboard layout, middleware)
 
 ### Phase 2: WhatsApp + AI Agent
 **Goal**: A clinic can connect a WhatsApp number and the AI SDR agent autonomously qualifies inbound leads via natural conversation in PT-BR, including LGPD consent on first contact
@@ -106,11 +107,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
 | 2. WhatsApp + AI Agent | 0/3 | Not started | - |
 | 3. CRM + Handoff + Scheduling | 0/3 | Not started | - |
 | 4. Dashboard + Settings | 0/3 | Not started | - |
