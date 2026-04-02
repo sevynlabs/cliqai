@@ -10,7 +10,8 @@
     "experimentalDecorators": true,
     "target": "ES2022",
     "sourceMap": true,
-    "incremental": true
+    "incremental": true,
+    "isolatedModules": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
