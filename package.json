@@ -1,0 +1,21 @@
+{
+  "name": "cliniqai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel run dev",
+    "build": "pnpm --filter @cliniq/shared build && pnpm --parallel --filter !@cliniq/shared run build",
+    "typecheck": "pnpm --parallel run typecheck",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "infra:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infrastructure/docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
