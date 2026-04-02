@@ -46,12 +46,12 @@ Plans:
   3. AI agent sends LGPD consent request as the first message to every new lead — no data is stored until consent is given
   4. Agent holds a multi-turn BANT qualification conversation in natural PT-BR without repeating itself or looping
   5. Agent never produces a message containing medical diagnosis, result promises, or blocked phrases — pre-response classifier blocks them
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Evolution API integration (webhook ingestion to BullMQ, QR code connect, rate limiting, deduplication, reconnection)
-- [ ] 02-02: LangGraph SDR agent (state machine, Redis checkpointer, LGPD consent node, BANT flow, persona config)
-- [ ] 02-03: Agent guardrails (objection handling, loop detection, max-turns handoff, medical ethics classifier, operating hours enforcement)
+- [ ] 02-01-PLAN.md — Evolution API integration (webhook ingestion to BullMQ, QR code connect, rate limiting, deduplication, reconnection)
+- [ ] 02-02-PLAN.md — LangGraph SDR agent (state machine, Redis checkpointer, LGPD consent node, BANT flow, persona config)
+- [ ] 02-03-PLAN.md — Agent guardrails (objection handling, loop detection, max-turns handoff, medical ethics classifier, operating hours enforcement)
 
 ### Phase 3: CRM + Handoff + Scheduling
 **Goal**: Every qualifying conversation creates a lead card in a pipeline, attendants can take over from AI instantly, and the agent can book confirmed appointments in Google Calendar
@@ -111,8 +111,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
-| 2. WhatsApp + AI Agent | 0/3 | Not started | - |
+| 1. Foundation | 4/4 | Complete | 2026-04-02 |
+| 2. WhatsApp + AI Agent | 0/3 | Planning complete | - |
 | 3. CRM + Handoff + Scheduling | 0/3 | Not started | - |
 | 4. Dashboard + Settings | 0/3 | Not started | - |
 | 5. Notifications + Follow-ups + Webhooks | 0/3 | Not started | - |
