@@ -1,4 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+/**
+ * Interface for any Prisma-like client that supports $queryRawUnsafe.
+ * This allows both PrismaClient and extended clients (like PrismaService) to be passed.
+ */
+interface PrismaLike {
+  $queryRawUnsafe<T = unknown>(query: string, ...values: unknown[]): Promise<T>;
+}
 
 function getEncryptionKey(): string {
   const key = process.env.PGCRYPTO_KEY;
@@ -13,7 +19,7 @@ function getEncryptionKey(): string {
  * Returns base64-encoded ciphertext suitable for storage in TEXT columns.
  */
 export async function encryptPii(
-  prisma: PrismaClient,
+  prisma: PrismaLike,
   plaintext: string,
 ): Promise<string> {
   const key = getEncryptionKey();
@@ -30,7 +36,7 @@ export async function encryptPii(
  * Returns the original plaintext.
  */
 export async function decryptPii(
-  prisma: PrismaClient,
+  prisma: PrismaLike,
   ciphertext: string,
 ): Promise<string> {
   const key = getEncryptionKey();

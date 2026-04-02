@@ -1,8 +1,16 @@
-import { Module } from "@nestjs/common";
+import { Module, MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { APP_GUARD } from "@nestjs/core";
+import { ClsModule } from "nestjs-cls";
 import { z } from "zod";
 import { HealthModule } from "./health/health.module";
 import { AppController } from "./app.controller";
+import { PrismaModule } from "./common/prisma/prisma.module";
+import { RedisModule } from "./common/redis/redis.module";
+import { QueueModule } from "./common/queue/queue.module";
+import { TenantMiddleware } from "./common/tenant/tenant.middleware";
+import { TenantGuard } from "./common/tenant/tenant.guard";
+import { LgpdModule } from "./modules/lgpd/lgpd.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -17,7 +25,10 @@ const envSchema = z.object({
 function validateEnv(config: Record<string, unknown>) {
   const result = envSchema.safeParse(config);
   if (!result.success) {
-    console.warn("Environment validation warnings:", result.error.flatten().fieldErrors);
+    console.warn(
+      "Environment validation warnings:",
+      result.error.flatten().fieldErrors,
+    );
   }
   return config;
 }
@@ -28,8 +39,25 @@ function validateEnv(config: Record<string, unknown>) {
       isGlobal: true,
       validate: validateEnv,
     }),
+    ClsModule.forRoot({
+      middleware: { mount: false },
+    }),
+    PrismaModule,
+    RedisModule,
+    QueueModule,
     HealthModule,
+    LgpdModule,
   ],
   controllers: [AppController],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: TenantGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantMiddleware).forRoutes("*");
+  }
+}

@@ -10,13 +10,20 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cliniq/shared": "workspace:*",
     "@cliniq/database": "workspace:*",
+    "@cliniq/shared": "workspace:*",
+    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "@prisma/client": "^5.22.0",
+    "bullmq": "^5.72.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "helmet": "^7.0.0",
+    "ioredis": "^5.10.1",
+    "nestjs-cls": "^6.2.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
     "zod": "^3.23.0"
@@ -24,6 +31,7 @@
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
     "@types/express": "^5.0.0",
+    "@types/ioredis": "^5.0.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   }
