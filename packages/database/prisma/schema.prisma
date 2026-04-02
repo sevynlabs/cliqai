@@ -101,6 +101,11 @@ model Organization {
   consentRecords  ConsentRecord[]
   erasureRequests ErasureRequest[]
 
+  // WhatsApp & Agent
+  whatsappInstance WhatsappInstance?
+  agentConfig      AgentConfig?
+  conversations    Conversation[]
+
   @@unique([slug])
   @@map("organization")
 }
@@ -183,4 +188,66 @@ model ErasureRequest {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("erasure_requests")
+}
+
+// ============================================================
+// WhatsApp & AI Agent models (Phase 2)
+// ============================================================
+
+/// WhatsApp instance connected to a clinic via Evolution API.
+/// One instance per organization (clinic).
+model WhatsappInstance {
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @unique @map("organization_id")
+  instanceName   String    @unique @map("instance_name")
+  status         String    @default("disconnected") // open | close | connecting | disconnected
+  phoneNumber    String?   @map("phone_number")
+  qrCodeBase64   String?   @map("qr_code_base64")
+  connectedAt    DateTime? @map("connected_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("whatsapp_instances")
+}
+
+/// Per-clinic AI agent configuration (persona, tone, operating hours).
+model AgentConfig {
+  id                  String   @id @default(uuid()) @db.Uuid
+  organizationId      String   @unique @map("organization_id")
+  personaName         String   @default("Sofia") @map("persona_name")
+  tone                String   @default("informal")
+  specialtyText       String?  @map("specialty_text")
+  emojiUsage          Boolean  @default(true) @map("emoji_usage")
+  operatingHoursStart Int      @default(8) @map("operating_hours_start")
+  operatingHoursEnd   Int      @default(20) @map("operating_hours_end")
+  timezone            String   @default("America/Sao_Paulo")
+  maxTurns            Int      @default(20) @map("max_turns")
+  systemPromptExtra   String?  @map("system_prompt_extra")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("agent_configs")
+}
+
+/// Active conversation thread between a lead and the AI agent.
+model Conversation {
+  id                 String   @id @default(uuid()) @db.Uuid
+  organizationId     String   @map("organization_id")
+  remoteJid          String   @map("remote_jid")
+  threadId           String   @unique @map("thread_id") // format: {orgId}:{remoteJid}
+  status             String   @default("active") // active | human_handling | closed
+  turnCount          Int      @default(0) @map("turn_count")
+  qualificationStage String   @default("consent") @map("qualification_stage")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, remoteJid])
+  @@index([organizationId, status])
+  @@map("conversations")
 }

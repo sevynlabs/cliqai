@@ -22,6 +22,7 @@ import { ConfigService } from "@nestjs/config";
     }),
     BullModule.registerQueue(
       { name: "whatsapp.inbound" },
+      { name: "whatsapp.outbound" },
       { name: "notifications" },
     ),
   ],
