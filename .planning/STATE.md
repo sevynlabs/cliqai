@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** AI agent qualifies leads via WhatsApp and converts them into confirmed appointments
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — WhatsApp + AI Agent
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation)
-Plan: 4 of 4 in current phase (PHASE COMPLETE)
-Status: Phase 1 Complete
-Last activity: 2026-04-02 — Completed 01-04 Frontend auth pages, dashboard shell, middleware
+Phase: 2 of 5 (WhatsApp + AI Agent)
+Plan: 1 of 3 in current phase
+Status: Executing Phase 2
+Last activity: 2026-04-02 — Completed 02-01 Evolution API WhatsApp integration
 
-Progress: [██████████] 20%
+Progress: [████████████] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~10m
-- Total execution time: ~0.64 hours
+- Total plans completed: 5
+- Average duration: ~9m
+- Total execution time: ~0.77 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | ~38m | ~10m |
+| 02-whatsapp-ai-agent | 1/3 | ~8m | ~8m |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (13m), 01-02 (8m), 01-03 (7m), 01-04 (10m)
+- Last 5 plans: 01-02 (8m), 01-03 (7m), 01-04 (10m), 02-01 (8m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -48,6 +49,9 @@ Recent decisions affecting current work:
 - Foundation: Better Auth organization.id used directly as tenantId — no separate Clinic table, ClinicSettings extends Organization
 - Foundation: @thallesp/nestjs-better-auth for NestJS integration — provides global AuthGuard, @Session, @OrgRoles, AuthService
 - WhatsApp: BullMQ queue-first ingestion — synchronous AI in webhook handler causes timeouts
+- WhatsApp: Separate outbound processor file with rate limiter (1 job/1500ms) for WhatsApp anti-spam
+- WhatsApp: Reconnection jobs routed through outbound queue, reusing rate limiter infrastructure
+- WhatsApp: Redis Stack (7.4.0-v3) replaces plain Redis for RedisJSON + RediSearch (LangGraph checkpointer)
 - Agent: LangGraph Redis checkpointer required — without it multi-turn conversations break on restart
 
 ### Pending Todos
@@ -63,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-02
-Stopped at: Completed 01-04-PLAN.md (Frontend auth pages, dashboard shell, middleware) -- Phase 1 COMPLETE
-Resume file: .planning/phases/01-foundation/01-04-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (Evolution API WhatsApp integration)
+Resume file: .planning/phases/02-whatsapp-ai-agent/02-01-SUMMARY.md
