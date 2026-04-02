@@ -5,37 +5,36 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding database...");
 
-  const clinic = await prisma.clinic.upsert({
+  // Better Auth manages user/session/account/organization tables.
+  // Seed only creates a demo organization and clinic settings for development.
+  const org = await prisma.organization.upsert({
     where: { slug: "clinica-demo" },
     update: {},
     create: {
+      id: "demo-org-001",
       name: "Clinica Demo",
       slug: "clinica-demo",
+      createdAt: new Date(),
+    },
+  });
+
+  console.log(`Created organization: ${org.name} (${org.id})`);
+
+  const settings = await prisma.clinicSettings.upsert({
+    where: { organizationId: org.id },
+    update: {},
+    create: {
+      organizationId: org.id,
       timezone: "America/Sao_Paulo",
       retentionDays: 365,
     },
   });
 
-  console.log(`Created clinic: ${clinic.name} (${clinic.id})`);
-
-  const user = await prisma.user.upsert({
-    where: {
-      clinicId_email: {
-        clinicId: clinic.id,
-        email: "admin@clinica-demo.com",
-      },
-    },
-    update: {},
-    create: {
-      clinicId: clinic.id,
-      email: "admin@clinica-demo.com",
-      name: "Admin Demo",
-      role: "OWNER",
-    },
-  });
-
-  console.log(`Created user: ${user.name} (${user.email})`);
+  console.log(`Created clinic settings: timezone=${settings.timezone}`);
   console.log("Seed complete.");
+  console.log(
+    "Note: Users are created via Better Auth signup, not seeds.",
+  );
 }
 
 main()

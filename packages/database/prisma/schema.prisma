@@ -7,47 +7,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  OWNER
-  ADMIN
-  MANAGER
-  ATTENDANT
+// ============================================================
+// Better Auth core tables (managed by Better Auth adapter)
+// ============================================================
+
+model User {
+  id            String       @id
+  name          String
+  email         String
+  emailVerified Boolean      @default(false) @map("email_verified")
+  image         String?
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  sessions    Session[]
+  accounts    Account[]
+  members     Member[]
+  invitations Invitation[]
+
+  @@unique([email])
+  @@map("user")
 }
 
-model Clinic {
-  id            String   @id @default(uuid()) @db.Uuid
-  name          String
-  slug          String   @unique
-  timezone      String   @default("America/Sao_Paulo")
-  retentionDays Int      @default(365) @map("retention_days")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+model Session {
+  id                   String   @id
+  expiresAt            DateTime @map("expires_at")
+  token                String
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  ipAddress            String?  @map("ip_address")
+  userAgent            String?  @map("user_agent")
+  userId               String   @map("user_id")
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganizationId String?  @map("active_organization_id")
 
-  users           User[]
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ============================================================
+// Better Auth organization plugin tables
+// Organization = Clinic (tenant). organization.id IS the tenantId.
+// ============================================================
+
+model Organization {
+  id        String   @id
+  name      String
+  slug      String
+  logo      String?
+  createdAt DateTime @map("created_at")
+  metadata  String?
+
+  members     Member[]
+  invitations Invitation[]
+
+  // Business extension: clinic-specific settings
+  clinicSettings ClinicSettings?
+
+  // Tenant-scoped business data
   consentRecords  ConsentRecord[]
   erasureRequests ErasureRequest[]
 
-  @@map("clinics")
+  @@unique([slug])
+  @@map("organization")
 }
 
-model User {
-  id       String   @id @default(uuid()) @db.Uuid
-  clinicId String   @map("clinic_id") @db.Uuid
-  email    String
-  name     String
-  role     UserRole @default(ATTENDANT)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model Member {
+  id             String       @id
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String       @map("user_id")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("member")
+  createdAt      DateTime     @map("created_at")
 
-  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  @@index([organizationId])
+  @@index([userId])
+  @@map("member")
+}
 
-  @@unique([clinicId, email])
-  @@map("users")
+model Invitation {
+  id             String       @id
+  organizationId String       @map("organization_id")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String       @default("pending")
+  expiresAt      DateTime     @map("expires_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  inviterId      String       @map("inviter_id")
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("invitation")
+}
+
+// ============================================================
+// CliniqAI business models
+// ============================================================
+
+/// Clinic-specific settings that extend the Better Auth Organization.
+/// Organization.id is used as the tenantId for all RLS policies.
+model ClinicSettings {
+  id             String   @id @default(uuid()) @db.Uuid
+  organizationId String   @unique @map("organization_id")
+  timezone       String   @default("America/Sao_Paulo")
+  retentionDays  Int      @default(365) @map("retention_days")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("clinic_settings")
 }
 
 model ConsentRecord {
   id              String   @id @default(uuid()) @db.Uuid
-  clinicId        String   @map("clinic_id") @db.Uuid
+  organizationId  String   @map("organization_id")
   leadPhone       String   @map("lead_phone")
   consentGiven    Boolean  @map("consent_given")
   consentVersion  String   @map("consent_version")
@@ -56,21 +166,21 @@ model ConsentRecord {
   ipAddress       String?  @map("ip_address")
   createdAt       DateTime @default(now()) @map("created_at")
 
-  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  @@index([clinicId, createdAt])
+  @@index([organizationId, createdAt])
   @@map("consent_records")
 }
 
 model ErasureRequest {
-  id          String    @id @default(uuid()) @db.Uuid
-  clinicId    String    @map("clinic_id") @db.Uuid
-  leadPhone   String    @map("lead_phone")
-  requestedAt DateTime  @default(now()) @map("requested_at")
-  processedAt DateTime? @map("processed_at")
-  status      String    @default("pending")
+  id             String    @id @default(uuid()) @db.Uuid
+  organizationId String    @map("organization_id")
+  leadPhone      String    @map("lead_phone")
+  requestedAt    DateTime  @default(now()) @map("requested_at")
+  processedAt    DateTime? @map("processed_at")
+  status         String    @default("pending")
 
-  clinic Clinic @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("erasure_requests")
 }

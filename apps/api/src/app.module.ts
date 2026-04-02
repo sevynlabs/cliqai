@@ -8,6 +8,8 @@ import { AppController } from "./app.controller";
 import { PrismaModule } from "./common/prisma/prisma.module";
 import { RedisModule } from "./common/redis/redis.module";
 import { QueueModule } from "./common/queue/queue.module";
+import { AuthModule } from "./common/auth/auth.module";
+import { RbacGuard } from "./common/auth/rbac.guard";
 import { TenantMiddleware } from "./common/tenant/tenant.middleware";
 import { TenantGuard } from "./common/tenant/tenant.guard";
 import { LgpdModule } from "./modules/lgpd/lgpd.module";
@@ -45,6 +47,7 @@ function validateEnv(config: Record<string, unknown>) {
     PrismaModule,
     RedisModule,
     QueueModule,
+    AuthModule,
     HealthModule,
     LgpdModule,
   ],
@@ -53,6 +56,10 @@ function validateEnv(config: Record<string, unknown>) {
     {
       provide: APP_GUARD,
       useClass: TenantGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RbacGuard,
     },
   ],
 })

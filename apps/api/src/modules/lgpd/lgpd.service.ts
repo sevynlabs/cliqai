@@ -10,13 +10,13 @@ export class LgpdService {
   /**
    * Records a consent entry with the leadPhone encrypted via pgcrypto.
    */
-  async recordConsent(clinicId: string, data: RecordConsentDto) {
+  async recordConsent(organizationId: string, data: RecordConsentDto) {
     const encryptedPhone = await encryptPii(this.prisma, data.leadPhone);
-    const tenant = this.prisma.forTenant(clinicId);
+    const tenant = this.prisma.forTenant(organizationId);
 
     return (tenant as any).consentRecord.create({
       data: {
-        clinicId,
+        organizationId,
         leadPhone: encryptedPhone,
         consentGiven: data.consentGiven,
         consentVersion: data.consentVersion,
@@ -30,13 +30,16 @@ export class LgpdService {
   /**
    * Checks if consent exists for a given phone number (encrypted lookup).
    */
-  async hasConsent(clinicId: string, leadPhone: string): Promise<boolean> {
+  async hasConsent(
+    organizationId: string,
+    leadPhone: string,
+  ): Promise<boolean> {
     const encryptedPhone = await encryptPii(this.prisma, leadPhone);
-    const tenant = this.prisma.forTenant(clinicId);
+    const tenant = this.prisma.forTenant(organizationId);
 
     const record = await (tenant as any).consentRecord.findFirst({
       where: {
-        clinicId,
+        organizationId,
         leadPhone: encryptedPhone,
         consentGiven: true,
       },
@@ -49,13 +52,13 @@ export class LgpdService {
   /**
    * Creates an erasure request for a phone number.
    */
-  async requestErasure(clinicId: string, leadPhone: string) {
+  async requestErasure(organizationId: string, leadPhone: string) {
     const encryptedPhone = await encryptPii(this.prisma, leadPhone);
-    const tenant = this.prisma.forTenant(clinicId);
+    const tenant = this.prisma.forTenant(organizationId);
 
     return (tenant as any).erasureRequest.create({
       data: {
-        clinicId,
+        organizationId,
         leadPhone: encryptedPhone,
         status: "pending",
       },
@@ -81,10 +84,10 @@ export class LgpdService {
       data: { status: "processing" },
     });
 
-    // Delete consent records for this phone in this clinic
+    // Delete consent records for this phone in this organization
     await this.prisma.consentRecord.deleteMany({
       where: {
-        clinicId: request.clinicId,
+        organizationId: request.organizationId,
         leadPhone: request.leadPhone,
       },
     });
