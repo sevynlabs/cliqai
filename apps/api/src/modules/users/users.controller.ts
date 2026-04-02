@@ -14,7 +14,7 @@ import { OrgRoles } from "@thallesp/nestjs-better-auth";
 import { UsersService } from "./users.service";
 import { InviteUserDto } from "./dto/invite-user.dto";
 
-@Controller("api/users")
+@Controller("users")
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,

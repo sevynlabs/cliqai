@@ -16,7 +16,7 @@ import {
 } from "../../common/auth/current-user.decorator";
 import { MinRole } from "../../common/auth/rbac.guard";
 
-@Controller("api/tenants")
+@Controller("tenants")
 export class TenantsController {
   constructor(
     private readonly tenantsService: TenantsService,

@@ -72,30 +72,36 @@ export class AgentService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    const redisUrl = this.configService.get<string>(
-      "REDIS_URL",
-      "redis://localhost:6380",
-    );
+    try {
+      const redisUrl = this.configService.get<string>(
+        "REDIS_URL",
+        "redis://localhost:6380",
+      );
 
-    const checkpointer = await createRedisCheckpointer(redisUrl);
+      const checkpointer = await createRedisCheckpointer(redisUrl);
 
-    // Create node functions as closures with injected dependencies
-    const nodes: SDRNodeFactory = {
-      consentCheckNode: createConsentCheckNode(this.lgpdService),
-      greetNode: createGreetNode(),
-      qualifyNode: createQualifyNode(),
-      ethicsGuardNode: createEthicsGuardNode(),
-      operatingHoursNode: createOperatingHoursNode(),
-      emergencyDetectNode: createEmergencyDetectNode(),
-      objectionNode: createObjectionNode(),
-      loopGuardNode: createLoopGuardNode(),
-      handoffNode: createHandoffNode(this.prisma, this.notificationsQueue),
-    };
+      // Create node functions as closures with injected dependencies
+      const nodes: SDRNodeFactory = {
+        consentCheckNode: createConsentCheckNode(this.lgpdService),
+        greetNode: createGreetNode(),
+        qualifyNode: createQualifyNode(),
+        ethicsGuardNode: createEthicsGuardNode(),
+        operatingHoursNode: createOperatingHoursNode(),
+        emergencyDetectNode: createEmergencyDetectNode(),
+        objectionNode: createObjectionNode(),
+        loopGuardNode: createLoopGuardNode(),
+        handoffNode: createHandoffNode(this.prisma, this.notificationsQueue),
+      };
 
-    this.compiledGraph = buildSDRGraph(checkpointer, nodes);
-    this.logger.log(
-      "SDR graph compiled with 9 nodes (3 core + 6 guardrails) and Redis checkpointer",
-    );
+      this.compiledGraph = buildSDRGraph(checkpointer, nodes);
+      this.logger.log(
+        "SDR graph compiled with 9 nodes (3 core + 6 guardrails) and Redis checkpointer",
+      );
+    } catch (err: any) {
+      this.logger.warn(
+        `SDR graph initialization deferred: ${err.message}. Agent will not process messages until configured.`,
+      );
+    }
   }
 
   /**

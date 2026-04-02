@@ -10,7 +10,7 @@ import { LgpdService } from "./lgpd.service";
 import { RecordConsentDto } from "./dto/record-consent.dto";
 import { ErasureRequestDto } from "./dto/erasure-request.dto";
 
-@Controller("api/lgpd")
+@Controller("lgpd")
 export class LgpdController {
   constructor(
     private readonly lgpdService: LgpdService,

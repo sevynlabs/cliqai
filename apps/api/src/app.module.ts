@@ -55,6 +55,7 @@ function validateEnv(config: Record<string, unknown>) {
       validate: validateEnv,
     }),
     ClsModule.forRoot({
+      global: true,
       middleware: { mount: false },
     }),
     PrismaModule,

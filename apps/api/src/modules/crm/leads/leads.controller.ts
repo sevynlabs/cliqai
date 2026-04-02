@@ -12,7 +12,7 @@ import { OrgRoles } from "@thallesp/nestjs-better-auth";
 import { LeadsService } from "./leads.service";
 import { UpdateStageDto } from "./dto/update-stage.dto";
 
-@Controller("api/leads")
+@Controller("leads")
 export class LeadsController {
   constructor(
     private readonly leadsService: LeadsService,

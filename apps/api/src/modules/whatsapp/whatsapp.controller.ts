@@ -17,7 +17,7 @@ import { CurrentUser, AuthUser } from "../../common/auth/current-user.decorator"
 import { WhatsappService } from "./whatsapp.service";
 import { EvolutionWebhookDto } from "./dto/evolution-webhook.dto";
 
-@Controller("api/whatsapp")
+@Controller("whatsapp")
 export class WhatsappController {
   private readonly logger = new Logger(WhatsappController.name);
 

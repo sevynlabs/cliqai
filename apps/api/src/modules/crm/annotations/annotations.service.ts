@@ -7,14 +7,19 @@ import type { SDRState } from "../../agent/graph/sdr.state";
 @Injectable()
 export class AnnotationsService {
   private readonly logger = new Logger(AnnotationsService.name);
-  private readonly llm: ChatAnthropic;
+  private llm: ChatAnthropic | null = null;
 
-  constructor(private readonly prisma: PrismaService) {
-    this.llm = new ChatAnthropic({
-      model: "claude-sonnet-4-20250514",
-      maxTokens: 100,
-      temperature: 0.3,
-    });
+  constructor(private readonly prisma: PrismaService) {}
+
+  private getLlm(): ChatAnthropic {
+    if (!this.llm) {
+      this.llm = new ChatAnthropic({
+        model: "claude-sonnet-4-20250514",
+        maxTokens: 100,
+        temperature: 0.3,
+      });
+    }
+    return this.llm;
   }
 
   /**
@@ -120,7 +125,7 @@ export class AnnotationsService {
         )
         .join("\n");
 
-      const result = await this.llm.invoke([
+      const result = await this.getLlm().invoke([
         new SystemMessage(instruction),
         new HumanMessage(conversationSnippet),
       ]);
