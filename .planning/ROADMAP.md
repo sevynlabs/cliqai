@@ -63,12 +63,12 @@ Plans:
   3. Attendant can take over a conversation with one click — AI stops responding immediately and attendant sees the full conversation context
   4. Agent presents available appointment slots and books a confirmed Google Calendar event upon lead acceptance — no double-bookings occur
   5. Attendant can return a conversation to AI and the agent resumes without losing context
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: CRM service (lead auto-creation, deduplication, Kanban pipeline, AI annotations, timeline, filters, search)
-- [ ] 03-02: Human handoff (takeover flow, dual-channel notification, AI/human mutex, return-to-AI)
-- [ ] 03-03: Google Calendar integration (OAuth per clinic, availability check, TENTATIVE lock, appointment CRUD, buffer time, holiday blocking)
+- [ ] 03-01-PLAN.md — CRM data layer (Prisma models, Lead upsert, AI annotations, pipeline service, filters, search)
+- [ ] 03-02-PLAN.md — Human handoff (Redis mutex, takeover/return-to-AI flow) + CRM frontend (Kanban with @dnd-kit, table view)
+- [ ] 03-03-PLAN.md — Google Calendar integration (OAuth per clinic, freeBusy availability, TENTATIVE lock, schedule node in SDR graph)
 
 ### Phase 4: Dashboard + Settings
 **Goal**: Clinic managers and owners can monitor KPIs, view conversations, manage the calendar, and configure the clinic and AI agent — all from a mobile-friendly web interface
@@ -113,6 +113,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-04-02 |
 | 2. WhatsApp + AI Agent | 0/3 | Planning complete | - |
-| 3. CRM + Handoff + Scheduling | 0/3 | Not started | - |
+| 3. CRM + Handoff + Scheduling | 0/3 | Planning complete | - |
 | 4. Dashboard + Settings | 0/3 | Not started | - |
 | 5. Notifications + Follow-ups + Webhooks | 0/3 | Not started | - |
