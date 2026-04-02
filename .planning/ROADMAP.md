@@ -112,7 +112,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-04-02 |
-| 2. WhatsApp + AI Agent | 0/3 | Planning complete | - |
-| 3. CRM + Handoff + Scheduling | 0/3 | Planning complete | - |
+| 2. WhatsApp + AI Agent | 3/3 | Complete | 2026-04-02 |
+| 3. CRM + Handoff + Scheduling | 1/3 | In progress | - |
 | 4. Dashboard + Settings | 0/3 | Not started | - |
 | 5. Notifications + Follow-ups + Webhooks | 0/3 | Not started | - |

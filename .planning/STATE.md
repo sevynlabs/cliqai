@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-04-02T22:31:42.134Z"
+status: executing
+last_updated: "2026-04-02T23:18:00.000Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** AI agent qualifies leads via WhatsApp and converts them into confirmed appointments
-**Current focus:** Phase 2 — WhatsApp + AI Agent
+**Current focus:** Phase 3 — CRM + Handoff + Scheduling
 
 ## Current Position
 
-Phase: 2 of 5 (WhatsApp + AI Agent)
-Plan: 3 of 3 in current phase (PHASE COMPLETE)
-Status: Phase 2 Complete — Ready for Phase 3
-Last activity: 2026-04-02 — Completed 02-03 Agent Guardrails
+Phase: 3 of 5 (CRM + Handoff + Scheduling)
+Plan: 1 of 3 in current phase
+Status: Executing Phase 3
+Last activity: 2026-04-02 — Completed 03-01 CRM Data Layer
 
-Progress: [████████████████████] 40%
+Progress: [████████████████████████] 50%
 
 ## Performance Metrics
 
@@ -43,12 +43,14 @@ Progress: [████████████████████] 40%
 | 01-foundation | 4/4 | ~38m | ~10m |
 | 02-whatsapp-ai-agent | 3/3 | ~18m | ~6m |
 
+| 03-crm-handoff-scheduling | 1/3 | ~17m | ~17m |
+
 **Recent Trend:**
-- Last 5 plans: 01-03 (7m), 01-04 (10m), 02-01 (8m), 02-02 (6m), 02-03 (4m)
-- Trend: Accelerating
+- Last 5 plans: 01-04 (10m), 02-01 (8m), 02-02 (6m), 02-03 (4m), 03-01 (17m)
+- Trend: Stable (Phase 3 more complex)
 
 *Updated after each plan completion*
-| Phase 02 P03 | 4m | 2 tasks | 10 files |
+| Phase 03 P01 | 17m | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -74,6 +76,10 @@ Recent decisions affecting current work:
 - Agent: Native Intl.DateTimeFormat for timezone conversion (no external library needed)
 - Agent: Human handoff node uses factory closure to inject PrismaService and BullMQ Queue
 - [Phase 02]: Dual ethics check (blocklist THEN LLM classifier) for speed and coverage on every outbound message
+- CRM: BANT score = count of true fields * 25 (0-100 scale) for lead scoring
+- CRM: AI annotations use ChatAnthropic 100 tokens with template fallback for resilience
+- CRM: Lead auto-qualifies to 'qualificado' when all 4 BANT fields are true
+- CRM: RLS on lead_annotations/lead_timeline uses subquery through leads table for tenant isolation
 
 ### Pending Todos
 
@@ -88,5 +94,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-02
-Stopped at: Completed 02-03-PLAN.md (Agent Guardrails) — Phase 2 Complete
-Resume file: .planning/phases/02-whatsapp-ai-agent/02-03-SUMMARY.md
+Stopped at: Completed 03-01-PLAN.md (CRM Data Layer) — Phase 3 Plan 1 of 3
+Resume file: .planning/phases/03-crm-handoff-scheduling/03-01-SUMMARY.md
