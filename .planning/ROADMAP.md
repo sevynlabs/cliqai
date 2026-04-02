@@ -28,7 +28,7 @@ CliniqAI is built in five phases, each delivering a complete vertical slice. Pha
   3. An attendant cannot access owner-only routes or another clinic's data (RBAC enforced at API level)
   4. LGPD consent schema exists — no lead record can be created without a `consent_given = true` record
   5. A developer can run `docker compose up` and reach a working local environment with all services
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 01-01: Monorepo scaffold (pnpm workspace, Next.js 16 + NestJS apps, shared packages, Docker Compose)
