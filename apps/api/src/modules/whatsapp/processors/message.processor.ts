@@ -4,6 +4,7 @@ import { Job } from "bullmq";
 import { PrismaService } from "../../../common/prisma/prisma.service";
 import { RedisService } from "../../../common/redis/redis.service";
 import { AgentService } from "../../agent/agent.service";
+import { LeadsService } from "../../crm/leads/leads.service";
 
 interface InboundMessageJobData {
   tenantId: string;
@@ -24,7 +25,7 @@ interface InboundMessageJobData {
 
 /**
  * BullMQ processor for the whatsapp.inbound queue.
- * Deduplicates messages, upserts conversations, and delegates to AgentService.
+ * Deduplicates messages, upserts conversations, upserts leads, and delegates to AgentService.
  */
 @Processor("whatsapp.inbound")
 export class MessageProcessor extends WorkerHost {
@@ -35,6 +36,7 @@ export class MessageProcessor extends WorkerHost {
     private readonly redis: RedisService,
     @Inject(forwardRef(() => AgentService))
     private readonly agentService: AgentService,
+    private readonly leadsService: LeadsService,
   ) {
     super();
   }
@@ -53,7 +55,7 @@ export class MessageProcessor extends WorkerHost {
 
     // Upsert conversation record
     const threadId = `${tenantId}:${key.remoteJid}`;
-    await this.prisma.conversation.upsert({
+    const conversation = await this.prisma.conversation.upsert({
       where: {
         organizationId_remoteJid: {
           organizationId: tenantId,
@@ -74,12 +76,24 @@ export class MessageProcessor extends WorkerHost {
       },
     });
 
+    // Upsert lead (deduplicated by org + phone)
+    const lead = await this.leadsService.upsertFromConversation(
+      tenantId,
+      key.remoteJid,
+      conversation.id,
+    );
+
     this.logger.log(
       `Processing message from ${key.remoteJid} for tenant ${tenantId}: "${textContent.substring(0, 50)}..."`,
     );
 
     try {
-      await this.agentService.processMessage(tenantId, instanceName, payload);
+      await this.agentService.processMessage(
+        tenantId,
+        instanceName,
+        payload,
+        lead.id,
+      );
     } catch (err: any) {
       const isRetryable =
         err?.message?.includes("timeout") ||

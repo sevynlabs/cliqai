@@ -102,6 +102,14 @@ export const SDRStateAnnotation = Annotation.Root({
     reducer: (_, b) => b,
     default: () => false,
   }),
+  leadId: Annotation<string | null>({
+    reducer: (_, b) => b,
+    default: () => null,
+  }),
+  appointmentId: Annotation<string | null>({
+    reducer: (_, b) => b,
+    default: () => null,
+  }),
 });
 
 export type SDRState = typeof SDRStateAnnotation.State;

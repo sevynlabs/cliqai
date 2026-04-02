@@ -13,6 +13,8 @@ import type { CompiledStateGraph } from "@langchain/langgraph";
 import { PrismaService } from "../../common/prisma/prisma.service";
 import { LgpdService } from "../lgpd/lgpd.service";
 import { WhatsappService } from "../whatsapp/whatsapp.service";
+import { LeadsService } from "../crm/leads/leads.service";
+import { AnnotationsService } from "../crm/annotations/annotations.service";
 import { createRedisCheckpointer } from "./memory/redis-checkpointer";
 import { buildSDRGraph, type SDRNodeFactory } from "./graph/sdr.graph";
 import { createConsentCheckNode } from "./graph/nodes/consent-check.node";
@@ -25,7 +27,7 @@ import { createObjectionNode } from "./graph/nodes/handle-objection.node";
 import { createLoopGuardNode } from "./graph/nodes/loop-guard.node";
 import { createHandoffNode } from "./graph/nodes/human-handoff.node";
 import { buildConsentPrompt } from "./prompts/system.prompt";
-import type { SDRState, AgentConfigState } from "./graph/sdr.state";
+import type { SDRState, AgentConfigState, BantScore } from "./graph/sdr.state";
 
 const DEFAULT_AGENT_CONFIG: AgentConfigState = {
   personaName: "Sofia",
@@ -38,6 +40,19 @@ const DEFAULT_AGENT_CONFIG: AgentConfigState = {
   maxTurns: 20,
   systemPromptExtra: null,
 };
+
+/**
+ * Calculate BANT score as a percentage (0-100).
+ * Each true BANT field = 25 points.
+ */
+function calculateBantScore(bant: BantScore): number {
+  let score = 0;
+  if (bant.budget) score += 25;
+  if (bant.authority) score += 25;
+  if (bant.need) score += 25;
+  if (bant.timeline) score += 25;
+  return score;
+}
 
 @Injectable()
 export class AgentService implements OnModuleInit {
@@ -52,6 +67,8 @@ export class AgentService implements OnModuleInit {
     private readonly configService: ConfigService,
     @InjectQueue("notifications")
     private readonly notificationsQueue: Queue,
+    private readonly leadsService: LeadsService,
+    private readonly annotationsService: AnnotationsService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -96,6 +113,7 @@ export class AgentService implements OnModuleInit {
       };
       textContent: string;
     },
+    leadId: string,
   ): Promise<void> {
     const text =
       payload.message.conversation ||
@@ -148,6 +166,7 @@ export class AgentService implements OnModuleInit {
         remoteJid,
         instanceName,
         agentConfig,
+        leadId,
       },
       {
         configurable: { thread_id: threadId },
@@ -212,6 +231,37 @@ export class AgentService implements OnModuleInit {
     } catch (err) {
       this.logger.warn(
         `Failed to update conversation for ${threadId}: ${err}`,
+      );
+    }
+
+    // CRM: Update lead fields from agent state and create AI annotations
+    try {
+      const stage =
+        result.qualificationStage === "qualify" &&
+        result.bantScore.budget &&
+        result.bantScore.authority &&
+        result.bantScore.need &&
+        result.bantScore.timeline
+          ? "qualificado"
+          : undefined;
+
+      await this.leadsService.updateFromAgentState(leadId, {
+        name: result.leadName,
+        procedureInterest: result.procedureInterest,
+        score: calculateBantScore(result.bantScore),
+        stage,
+      });
+    } catch (err: any) {
+      this.logger.warn(
+        `Failed to update lead ${leadId} from agent state: ${err.message}`,
+      );
+    }
+
+    try {
+      await this.annotationsService.createFromAgent(leadId, result);
+    } catch (err: any) {
+      this.logger.warn(
+        `Failed to create annotations for lead ${leadId}: ${err.message}`,
       );
     }
   }
