@@ -14,11 +14,11 @@
 
 ### Authentication & Multi-Tenancy
 
-- [ ] **AUTH-01**: User can sign up and create a clinic (tenant)
-- [ ] **AUTH-02**: User can log in with email/password and stay logged in across sessions (JWT + refresh tokens)
-- [ ] **AUTH-03**: User can reset password via email link
-- [ ] **AUTH-04**: Clinic owner can invite users with roles (admin, manager, attendant)
-- [ ] **AUTH-05**: RBAC enforces permissions per role (owner full access, attendant conversations only)
+- [x] **AUTH-01**: User can sign up and create a clinic (tenant)
+- [x] **AUTH-02**: User can log in with email/password and stay logged in across sessions (JWT + refresh tokens)
+- [x] **AUTH-03**: User can reset password via email link
+- [x] **AUTH-04**: Clinic owner can invite users with roles (admin, manager, attendant)
+- [x] **AUTH-05**: RBAC enforces permissions per role (owner full access, attendant conversations only)
 - [x] **AUTH-06**: All data queries are tenant-scoped (no cross-clinic data leakage)
 
 ### WhatsApp Integration
@@ -165,11 +165,11 @@
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
 | LGPD-01 | Phase 1 | Complete |
 | LGPD-02 | Phase 1 | Complete |
