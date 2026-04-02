@@ -98,6 +98,10 @@ export const SDRStateAnnotation = Annotation.Root({
     reducer: (_, b) => b,
     default: () => null,
   }),
+  ethicsBlocked: Annotation<boolean>({
+    reducer: (_, b) => b,
+    default: () => false,
+  }),
 });
 
 export type SDRState = typeof SDRStateAnnotation.State;
