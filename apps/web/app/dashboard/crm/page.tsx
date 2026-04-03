@@ -19,7 +19,7 @@ export default function CrmPage() {
               Kanban
             </span>
             <Link
-              href="/crm/table"
+              href="/dashboard/crm/table"
               className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
             >
               Tabela

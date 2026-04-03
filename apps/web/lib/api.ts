@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+// Use same origin — Next.js rewrites /api/* to the NestJS backend
+const API_URL = typeof window !== "undefined" ? "" : "http://localhost:3001";
 
 class ApiError extends Error {
   constructor(

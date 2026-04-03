@@ -144,7 +144,7 @@ export default function CrmTablePage() {
           </h1>
           <div className="flex gap-2">
             <Link
-              href="/crm"
+              href="/dashboard/crm"
               className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
             >
               Kanban
