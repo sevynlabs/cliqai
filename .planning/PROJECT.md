@@ -8,36 +8,60 @@ CliniqAI is a SaaS AI platform specialized in converting leads into appointments
 
 The AI agent must successfully qualify leads via WhatsApp and convert them into confirmed appointments — this is the ONE thing that must work. Everything else (dashboard, analytics, multi-channel) supports this core conversion loop.
 
+## Current Milestone: v2.0 — Scale & Premium Features
+
+**Goal:** Transform CliniqAI from MVP into a production-grade multi-channel platform with dark mode, i18n, real-time updates, advanced analytics, payment integration, Instagram DM, Voice AI, PDF reports, and mobile app.
+
+**Target features:**
+- Dark mode with system preference detection
+- Multi-language support (PT-BR, EN, ES)
+- WebSocket real-time dashboard (replace polling)
+- Predictive analytics with ML lead scoring
+- PDF report generation (KPIs, funnel, leads)
+- Payment integration (Stripe + Pix)
+- Instagram DM as second channel
+- Voice AI for phone calls
+- React Native mobile app
+
 ## Requirements
 
-### Validated
+### Validated (v1.0)
 
-(None yet — ship to validate)
+- [x] AI SDR Agent with configurable persona, BANT qualification flow, objection handling, and human handoff
+- [x] WhatsApp integration via Evolution API (multi-instance, QR code connect, message types, reconnection)
+- [x] Intelligent CRM with Kanban pipeline, auto-populated lead cards, AI annotations, timeline
+- [x] Google Calendar integration for automated scheduling (availability check, create/cancel/reschedule, multi-calendar)
+- [x] Automated notification system (confirmation, reminders, no-show recovery) via WhatsApp
+- [x] Intelligent follow-up sequences with timing, cool-down rules
+- [x] Bidirectional webhook system for external integrations (lead sources, Meta Lead Ads)
+- [x] Web dashboard for clinic managers (KPIs, agent status, conversations, calendar, settings)
+- [x] Multi-tenant architecture (multi-clinic support with isolated data)
+- [x] User management with RBAC (owner, admin, manager, attendant roles)
+- [x] LGPD compliance (consent collection, data retention, right to erasure)
+- [x] Agent business rules (no medical diagnosis, no result promises, operating hours, rate limiting, emergency escalation)
+- [x] Procedures, professionals, and message templates CRUD
+- [x] Lead analytics (source, score distribution, top procedures)
+- [x] CSV export with filters
 
-### Active
+### Active (v2.0)
 
-- [ ] AI SDR Agent with configurable persona, BANT qualification flow, objection handling, and human handoff
-- [ ] WhatsApp integration via Evolution API (multi-instance, QR code connect, message types, reconnection)
-- [ ] Intelligent CRM with Kanban pipeline, auto-populated lead cards, AI annotations, timeline
-- [ ] Google Calendar integration for automated scheduling (availability check, create/cancel/reschedule, multi-calendar)
-- [ ] Automated notification system (confirmation, reminders, no-show recovery) via WhatsApp/email/SMS
-- [ ] Intelligent follow-up sequences with timing, A/B testing, cool-down rules
-- [ ] Bidirectional webhook system for external integrations (ERPs, lead sources, payment platforms)
-- [ ] Web dashboard for clinic managers (KPIs, agent status, conversations, calendar, settings)
-- [ ] Multi-tenant architecture (multi-clinic support with isolated data)
-- [ ] User management with RBAC (owner, admin, manager, attendant roles)
-- [ ] LGPD compliance (consent collection, data retention, right to erasure)
-- [ ] Agent business rules (no medical diagnosis, no result promises, operating hours, rate limiting, emergency escalation)
+- [ ] Dark mode with system preference detection and manual toggle
+- [ ] Multi-language support (PT-BR, EN, ES) with dynamic switching
+- [ ] WebSocket real-time updates (dashboard, conversations, notifications)
+- [ ] Predictive analytics (churn prediction, lead scoring ML, conversion forecast)
+- [ ] PDF report generation (KPIs, funnel, lead pipeline, appointments)
+- [ ] Payment integration (Stripe for international, Pix for Brazil)
+- [ ] Instagram DM channel (second channel beyond WhatsApp)
+- [ ] Voice AI for inbound/outbound phone calls
+- [ ] React Native mobile app (iOS + Android)
 
 ### Out of Scope
 
-- Voice AI / phone calls — complexity too high for MVP, defer to v2+
-- Native mobile app — web dashboard is mobile-first responsive, native app later
 - Video consultations / telemedicine — out of core SDR scope
-- Payment processing — integrate via webhooks, don't build payment infrastructure
 - Electronic medical records (EMR) — integrate via webhooks, don't build EMR
-- Sentiment analysis with emotion detection — defer to premium features phase
-- Predictive analytics / churn prediction — defer to premium features phase
+- Zapier/n8n native integration — webhook system is sufficient for v2
+- A/B testing of agent messages — defer to v3
+- Native desktop app — web + mobile covers all use cases
 
 ## Context
 
@@ -48,29 +72,29 @@ The AI agent must successfully qualify leads via WhatsApp and convert them into 
 - **Channel:** WhatsApp is the #1 communication channel — Evolution API provides enterprise-grade abstraction over Baileys.
 - **Users:** Clinic owners, managers, and receptionists who need a simple, mobile-friendly dashboard.
 - **AI Engine:** LangGraph for agent orchestration with state machine, memory, and tool-calling capabilities.
+- **v1.0 shipped:** All 5 phases complete. 16 plans executed. Full-stack platform operational.
 
 ## Constraints
 
 - **Tech Stack**: Next.js (frontend), Node.js/NestJS (backend), PostgreSQL + Redis, LangGraph (AI), Evolution API (WhatsApp)
 - **Language**: Brazilian Portuguese as primary language for all agent interactions
 - **Compliance**: LGPD mandatory — consent before data processing, right to erasure
-- **WhatsApp**: Must support both WhatsApp Business and personal WhatsApp numbers
-- **Operating Hours**: Agent must respect clinic operating hours (configurable, default 8h-20h)
-- **Medical Ethics**: Agent NEVER provides medical diagnosis or promises specific procedure results
-- **Design System**: Plus Jakarta Sans (headings) + Inter (body), clinical color palette with teal primary (#0D9488)
+- **Design System**: Plus Jakarta Sans (headings) + Inter (body), teal primary (#0D9488), Tailwind v4 utilities
+- **Mobile**: React Native with Expo for cross-platform (shared business logic where possible)
+- **Payments**: Stripe for credit card, Pix for Brazilian instant payment
+- **Voice**: Twilio or similar for telephony infrastructure
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Evolution API over raw Baileys | Stability, enterprise features, multi-instance management, webhook support | — Pending |
-| LangGraph for AI orchestration | State machine + memory + tool-calling, ideal for conversational SDR flow | — Pending |
-| Event-driven microservices architecture | Horizontal scaling, low latency for real-time conversations | — Pending |
-| Redis/BullMQ for message broker | Retry, dead-letter queue, rate limiting for WhatsApp messages | — Pending |
-| Next.js for dashboard | SSR for SEO, React ecosystem, mobile-first responsive | — Pending |
-| PostgreSQL + Redis for data layer | Relational for CRM/leads, Redis for cache/sessions/queues | — Pending |
-| Multi-tenant with isolated data | Each clinic gets own WhatsApp instance, calendar, and data | — Pending |
-| Plus Jakarta Sans + Inter typography | Modern, professional, high legibility for data-dense dashboards | — Pending |
+| Evolution API over raw Baileys | Stability, enterprise features, multi-instance management | ✓ Good |
+| LangGraph for AI orchestration | State machine + memory + tool-calling, ideal for conversational SDR | ✓ Good |
+| BullMQ for message broker | Retry, dead-letter queue, rate limiting for WhatsApp messages | ✓ Good |
+| Better Auth for authentication | App Router native, RBAC, multi-tenant sessions, organization plugin | ✓ Good |
+| Tailwind v4 with @utility | Custom design system without CSS-in-JS, tree-shakeable | ✓ Good |
+| React Query for data fetching | Caching, optimistic updates, refetch intervals | ✓ Good |
+| Prisma ORM | Type-safe queries, migrations, multi-tenant scoping | ✓ Good |
 
 ---
-*Last updated: 2026-04-02 after initialization*
+*Last updated: 2026-04-03 after v2.0 milestone start*
