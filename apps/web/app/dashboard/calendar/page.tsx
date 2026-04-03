@@ -147,38 +147,42 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
 
       {/* Reschedule form */}
       {showReschedule && (
-        <div className="mt-3 pt-3 border-t border-border/40 flex items-end gap-2">
-          <div className="flex-1">
-            <label className="text-[10px] font-medium text-gray-400 mb-1 block">Nova data</label>
-            <input
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              className="input-base text-xs py-1.5"
-            />
+        <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-medium text-gray-400 mb-1 block">Nova data</label>
+              <input
+                type="date"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="input-base text-xs py-1.5"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-medium text-gray-400 mb-1 block">Horario</label>
+              <input
+                type="time"
+                value={newTime}
+                onChange={(e) => setNewTime(e.target.value)}
+                className="input-base text-xs py-1.5"
+              />
+            </div>
           </div>
-          <div className="flex-1">
-            <label className="text-[10px] font-medium text-gray-400 mb-1 block">Horario</label>
-            <input
-              type="time"
-              value={newTime}
-              onChange={(e) => setNewTime(e.target.value)}
-              className="input-base text-xs py-1.5"
-            />
+          <div className="flex gap-2">
+            <button
+              onClick={() => reschedule.mutate()}
+              disabled={reschedule.isPending || !newDate || !newTime}
+              className="btn-primary text-xs px-3 py-1.5"
+            >
+              {reschedule.isPending ? "..." : "Reagendar"}
+            </button>
+            <button
+              onClick={() => setShowReschedule(false)}
+              className="btn-ghost text-xs px-2 py-1.5"
+            >
+              Cancelar
+            </button>
           </div>
-          <button
-            onClick={() => reschedule.mutate()}
-            disabled={reschedule.isPending || !newDate || !newTime}
-            className="btn-primary text-xs px-3 py-1.5"
-          >
-            {reschedule.isPending ? "..." : "Reagendar"}
-          </button>
-          <button
-            onClick={() => setShowReschedule(false)}
-            className="btn-ghost text-xs px-2 py-1.5"
-          >
-            Cancelar
-          </button>
         </div>
       )}
     </div>

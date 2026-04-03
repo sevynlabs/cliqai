@@ -14,6 +14,7 @@ import {
   Hand,
   RotateCcw,
   Phone,
+  ArrowLeft,
   ArrowRightLeft,
 } from "lucide-react";
 
@@ -149,7 +150,7 @@ function ConversationList({
   );
 }
 
-function ChatThread({ conversationId, conversation }: { conversationId: string; conversation?: Conversation }) {
+function ChatThread({ conversationId, conversation, onBack }: { conversationId: string; conversation?: Conversation; onBack?: () => void }) {
   const qc = useQueryClient();
   const [draft, setDraft] = useState("");
 
@@ -193,8 +194,16 @@ function ChatThread({ conversationId, conversation }: { conversationId: string; 
   return (
     <div className="flex flex-col h-full">
       {/* Chat header */}
-      <div className="flex items-center justify-between border-b border-border/60 px-5 py-3">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-border/60 px-3 lg:px-5 py-3">
+        <div className="flex items-center gap-2 lg:gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="lg:hidden rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 -ml-1"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+          )}
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100">
             <User className="h-4 w-4 text-gray-500" />
           </div>
@@ -341,8 +350,8 @@ function ConversationsContent() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] lg:h-screen">
-      {/* Sidebar */}
-      <div className="w-[320px] flex-shrink-0 border-r border-border/60 bg-surface-raised flex flex-col pt-4">
+      {/* Sidebar — hidden on mobile when chat is open */}
+      <div className={`${selected ? "hidden lg:flex" : "flex"} w-full lg:w-[320px] flex-shrink-0 border-r border-border/60 bg-surface-raised flex-col pt-4`}>
         <div className="flex items-center gap-2 px-5 pb-3">
           <MessageCircle className="h-4.5 w-4.5 text-gray-400" strokeWidth={1.5} />
           <h2 className="font-heading text-base font-semibold text-gray-900">
@@ -355,10 +364,14 @@ function ConversationsContent() {
         <ConversationList selected={selected} onSelect={setSelected} />
       </div>
 
-      {/* Chat area */}
-      <div className="flex-1 bg-surface-raised">
+      {/* Chat area — hidden on mobile when no chat selected */}
+      <div className={`${selected ? "flex" : "hidden lg:flex"} flex-1 flex-col bg-surface-raised`}>
         {selected ? (
-          <ChatThread conversationId={selected} conversation={selectedConvo} />
+          <ChatThread
+            conversationId={selected}
+            conversation={selectedConvo}
+            onBack={() => setSelected(null)}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 mb-4">
