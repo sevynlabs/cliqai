@@ -1,249 +1,120 @@
-# Requirements: CliniqAI
+# Requirements: CliniqAI v2.0
 
-**Defined:** 2026-04-02
+**Defined:** 2026-04-03
 **Core Value:** AI agent qualifies leads via WhatsApp and converts them into confirmed appointments
 
-## v1 Requirements
+## v2.0 Requirements
 
-### Foundation
+### Dark Mode & Theming
 
-- [x] **FOUND-01**: System uses TypeScript monorepo (Next.js 16 frontend + NestJS backend + shared types)
-- [x] **FOUND-02**: PostgreSQL database with multi-tenant row-level security from migration 0001
-- [x] **FOUND-03**: Redis for caching, sessions, BullMQ queues, and LangGraph checkpointer
-- [x] **FOUND-04**: Docker Compose for local development environment
+- [ ] **THEME-01**: User can toggle between light and dark themes via dashboard setting
+- [ ] **THEME-02**: System detects OS preference (prefers-color-scheme) and applies automatically on first visit
+- [ ] **THEME-03**: Theme preference persists across sessions (localStorage + cookie for SSR)
+- [ ] **THEME-04**: All dashboard components render correctly in dark mode (cards, inputs, badges, charts)
 
-### Authentication & Multi-Tenancy
+### Internationalization (i18n)
 
-- [x] **AUTH-01**: User can sign up and create a clinic (tenant)
-- [x] **AUTH-02**: User can log in with email/password and stay logged in across sessions (JWT + refresh tokens)
-- [x] **AUTH-03**: User can reset password via email link
-- [x] **AUTH-04**: Clinic owner can invite users with roles (admin, manager, attendant)
-- [x] **AUTH-05**: RBAC enforces permissions per role (owner full access, attendant conversations only)
-- [x] **AUTH-06**: All data queries are tenant-scoped (no cross-clinic data leakage)
+- [ ] **I18N-01**: User can switch language between PT-BR, EN, and ES from dashboard header
+- [ ] **I18N-02**: All static UI text (labels, buttons, placeholders, error messages) is translated
+- [ ] **I18N-03**: Date/time formatting adapts to selected locale (date-fns locale)
+- [ ] **I18N-04**: Language preference persists across sessions
+- [ ] **I18N-05**: Landing page and auth pages support all 3 languages
 
-### WhatsApp Integration
+### Real-Time Updates (WebSocket)
 
-- [ ] **WHATS-01**: Clinic can connect WhatsApp number via QR code in dashboard
-- [ ] **WHATS-02**: System receives messages via Evolution API webhooks and enqueues to BullMQ in <100ms
-- [ ] **WHATS-03**: System sends text, image, document, audio, and location messages via WhatsApp
-- [ ] **WHATS-04**: Auto-reconnection with retry and admin notification on disconnection
-- [ ] **WHATS-05**: Connection status visible in real-time on dashboard
-- [ ] **WHATS-06**: Rate limiting per WhatsApp number with queue backpressure and jitter
-- [ ] **WHATS-07**: Message deduplication to prevent duplicate processing
+- [ ] **RT-01**: Dashboard KPIs update instantly when new leads or appointments arrive (no polling)
+- [ ] **RT-02**: Conversation messages appear in real-time without manual refresh
+- [ ] **RT-03**: Notification badges update instantly when new activity occurs
+- [ ] **RT-04**: CRM kanban reflects stage changes by other users in real-time
+- [ ] **RT-05**: Agent health status updates push instantly on connection change
 
-### AI SDR Agent
+### Predictive Analytics
 
-- [ ] **AGENT-01**: LangGraph-based agent with state machine, memory (Redis checkpointer), and tool-calling
-- [ ] **AGENT-02**: Configurable persona per clinic (name, tone, specialty vocabulary, emoji usage)
-- [ ] **AGENT-03**: BANT qualification flow via natural conversation (Budget, Authority, Need, Timeline)
-- [x] **AGENT-04**: Objection handling for common objections (price, fear, timing, "send me info")
-- [x] **AGENT-05**: Agent NEVER provides medical diagnosis or promises specific procedure results
-- [x] **AGENT-06**: Agent respects operating hours (configurable per clinic, default 8h-20h)
-- [x] **AGENT-07**: Max conversation turns before human handoff (configurable, default 20)
-- [x] **AGENT-08**: Emergency escalation detection (medical emergencies, complaints, legal requests)
-- [x] **AGENT-09**: Loop guard with max-turn limits and fallback to human handoff
-- [ ] **AGENT-10**: LGPD consent collection as first interaction before any data storage
+- [ ] **ANAL-01**: Dashboard shows lead conversion probability per lead (ML-based score)
+- [ ] **ANAL-02**: Dashboard shows churn risk indicator for leads going cold
+- [ ] **ANAL-03**: Dashboard shows weekly/monthly conversion forecast
+- [ ] **ANAL-04**: Lead scoring model uses conversation data, engagement, and BANT completion
+- [ ] **ANAL-05**: Analytics data exportable as part of PDF reports
 
-### CRM
+### PDF Reports
 
-- [ ] **CRM-01**: New WhatsApp conversation auto-creates lead card (deduplicated by phone number)
-- [ ] **CRM-02**: Kanban pipeline view with drag-and-drop (Novo → Qualificado → Agendado → Confirmado → Atendido → Perdido)
-- [ ] **CRM-03**: Lead card with auto-populated data (name, phone, email, procedure, score, tags, timeline)
-- [ ] **CRM-04**: AI generates annotations after each significant interaction (summary, objections, next steps)
-- [ ] **CRM-05**: Table view and list view alternatives to Kanban
-- [ ] **CRM-06**: Filters by source, procedure, professional, date, score, tags
-- [ ] **CRM-07**: Global search by name, phone, email, or any field
+- [ ] **PDF-01**: User can generate PDF report for KPIs dashboard (daily/weekly/monthly)
+- [ ] **PDF-02**: User can generate PDF report for lead pipeline (filtered by date range, stage, source)
+- [ ] **PDF-03**: User can generate PDF report for appointments (calendar summary)
+- [ ] **PDF-04**: PDF includes clinic branding (name, logo) and generation timestamp
+- [ ] **PDF-05**: PDF can be downloaded directly or sent via email
 
-### Human Handoff
+### Payment Integration
 
-- [ ] **HAND-01**: Attendant can take over conversation from AI with one click
-- [ ] **HAND-02**: AI context (summary, annotations) visible to human during takeover
-- [ ] **HAND-03**: Attendant can return conversation to AI agent
-- [ ] **HAND-04**: AI/human mutex prevents both from responding simultaneously
+- [ ] **PAY-01**: Clinic can connect Stripe account for credit card payments
+- [ ] **PAY-02**: Clinic can configure Pix payment (Brazilian instant payment)
+- [ ] **PAY-03**: Agent can send payment link during conversation after appointment booking
+- [ ] **PAY-04**: Payment status visible in appointment detail (paid/pending/failed)
+- [ ] **PAY-05**: Dashboard shows revenue KPIs (total collected, pending, by procedure)
 
-### Scheduling
+### Instagram DM Channel
 
-- [ ] **SCHED-01**: Google Calendar OAuth integration per clinic (multi-calendar per professional)
-- [ ] **SCHED-02**: Agent checks real-time availability before suggesting appointment slots
-- [ ] **SCHED-03**: Agent creates calendar event with patient details upon confirmation
-- [ ] **SCHED-04**: Agent can cancel and reschedule appointments via conversation
-- [ ] **SCHED-05**: Buffer time between appointments (configurable per procedure/professional)
-- [ ] **SCHED-06**: TENTATIVE event lock pattern to prevent double-booking race conditions
-- [ ] **SCHED-07**: Operating hours and holiday blocking on calendar
+- [ ] **INSTA-01**: Clinic can connect Instagram Business account via Meta Graph API
+- [ ] **INSTA-02**: Inbound Instagram DMs are processed by the same AI agent
+- [ ] **INSTA-03**: Agent can respond via Instagram DM with text and images
+- [ ] **INSTA-04**: Conversations inbox shows Instagram and WhatsApp conversations unified
+- [ ] **INSTA-05**: Lead source tracks "instagram" for attribution
 
-### Notifications
+### Voice AI
 
-- [ ] **NOTIF-01**: Appointment confirmation message via WhatsApp after booking
-- [ ] **NOTIF-02**: Appointment reminders (24h and 1h before) via WhatsApp
-- [ ] **NOTIF-03**: No-show recovery message with re-scheduling option
-- [ ] **NOTIF-04**: Opt-out tracking per lead (stop sending if requested)
-- [ ] **NOTIF-05**: Operating hours enforcement for all outbound messages
+- [ ] **VOICE-01**: Clinic can configure a phone number for inbound voice calls
+- [ ] **VOICE-02**: AI agent handles inbound calls with speech-to-text and text-to-speech
+- [ ] **VOICE-03**: Agent follows same qualification flow (BANT) via voice
+- [ ] **VOICE-04**: Call recordings are stored and playable from lead timeline
+- [ ] **VOICE-05**: Handoff to human during active call
 
-### Follow-ups
+### Mobile App
 
-- [ ] **FOLLOW-01**: Automated follow-up sequences with configurable timing
-- [ ] **FOLLOW-02**: Cool-down rules (max 3 attempts per sequence, 7-day cool-down between sequences)
-- [ ] **FOLLOW-03**: Stop-on-reply (follow-up pauses when lead responds)
-- [ ] **FOLLOW-04**: Personalized messages based on conversation history (never generic repeated)
+- [ ] **MOB-01**: React Native app authenticates with existing Better Auth session
+- [ ] **MOB-02**: App shows dashboard KPIs and lead pipeline
+- [ ] **MOB-03**: App shows conversation inbox with real-time messages
+- [ ] **MOB-04**: App supports push notifications for new leads and appointments
+- [ ] **MOB-05**: App supports human handoff (takeover/return) from mobile
 
-### Dashboard
+## v3.0 Requirements (Deferred)
 
-- [ ] **DASH-01**: KPI cards: Leads today, Appointments today, Conversion rate, Revenue pipeline
-- [ ] **DASH-02**: Conversion funnel chart (last 30 days)
-- [ ] **DASH-03**: Recent activity timeline (agent actions, bookings, follow-ups)
-- [ ] **DASH-04**: Today's agenda with confirmation status
-- [ ] **DASH-05**: Agent health indicator (connected, messages/hour, errors, latency)
-- [ ] **DASH-06**: WhatsApp conversation view (inbox, chat thread, lead details side panel)
-- [ ] **DASH-07**: Calendar view (month/week/day) with color-coded events per procedure
-- [ ] **DASH-08**: Mobile-responsive layout (touch-friendly, works on phone/tablet)
-- [ ] **DASH-09**: Sidebar navigation with clinic selector (multi-clinic support)
+### A/B Testing
+- **AB-01**: Admin can create message variants for the AI agent
+- **AB-02**: System randomly assigns variants and tracks conversion rates
 
-### Settings
-
-- [ ] **SET-01**: Clinic profile (name, logo, address, hours, timezone)
-- [ ] **SET-02**: Agent configuration (persona name, tone, scripts, knowledge base)
-- [ ] **SET-03**: Procedures CRUD (name, duration, price, prep instructions, authorized professionals)
-- [ ] **SET-04**: Professionals CRUD (name, calendar, specialties, working hours)
-- [ ] **SET-05**: Follow-up sequence templates editor
-- [ ] **SET-06**: Notification templates editor
-
-### Compliance
-
-- [x] **LGPD-01**: Consent collected and logged before any personal data processing
-- [x] **LGPD-02**: Right to erasure — complete data deletion upon lead request
-- [x] **LGPD-03**: Data retention policy with configurable retention periods
-- [x] **LGPD-04**: PII encrypted at rest (pgcrypto)
-
-### Webhooks
-
-- [ ] **HOOK-01**: Webhook-in receiver for Meta Lead Ads, Google Ads, and generic lead sources
-- [ ] **HOOK-02**: Webhook-out for key events (lead.created, appointment.booked, lead.converted)
-- [ ] **HOOK-03**: HMAC-SHA256 signature verification on all inbound webhooks
-- [ ] **HOOK-04**: Retry with exponential backoff for failed outbound webhooks
-
-## v2 Requirements
-
-### Advanced AI
-
-- **AI-V2-01**: Sentiment analysis with emotion tagging per conversation
-- **AI-V2-02**: Predictive lead scoring based on conversion history
-- **AI-V2-03**: Audio message transcription via Whisper
-- **AI-V2-04**: AI copilot suggestions when human is handling conversation
-
-### Growth & Marketing
-
-- **GROW-01**: A/B testing for follow-up message variants
-- **GROW-02**: Agent performance analytics (AI vs human conversion rates)
-- **GROW-03**: Campaign tracking (UTM → lead source attribution)
-- **GROW-04**: Referral tracking between leads
-
-### Operations
-
-- **OPS-01**: Waitlist when no slots available
-- **OPS-02**: Overbooking rules (configurable per clinic)
-- **OPS-03**: Email and SMS fallback channels for notifications
-- **OPS-04**: Multi-clinic agency view with consolidated dashboard
+### Zapier/n8n
+- **ZAP-01**: Native Zapier triggers for lead.created, appointment.booked
+- **ZAP-02**: Native Zapier actions for create lead, update stage
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Electronic Medical Records (EMR) | CFM regulations, scope explosion — integrate via webhooks to existing EMR |
-| Payment processing / PIX checkout | PCI-DSS compliance, financial licensing — send payment links via WhatsApp |
-| Voice AI / phone calls | Separate telephony infrastructure — WhatsApp-first, voice in v3+ |
-| Native iOS/Android app | Mobile-first PWA sufficient — native app after product-market fit |
-| Visual chatbot flow builder | Clinic staff can't configure correctly; support burden — use persona config UI |
-| Social media DMs (Instagram, Facebook) | Separate APIs, rate limits — validate WhatsApp first, add channels in v2 |
-| Internal team chat | Slack/Teams scope — use internal notes on lead card |
-| AI medical diagnosis / symptom checker | CFM prohibits AI medical opinions — agent always disclaims and escalates |
+| Video consultations | Out of core SDR scope, defer to v3+ |
+| EMR integration | Build webhook connectors, not EMR itself |
+| Desktop app | Web + mobile covers all use cases |
+| Multi-clinic marketplace | Single-tenant SaaS model for now |
+| Sentiment analysis | ML complexity too high, defer to v3 |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 1 | Complete |
-| FOUND-03 | Phase 1 | Complete |
-| FOUND-04 | Phase 1 | Complete |
-| AUTH-01 | Phase 1 | Complete |
-| AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Complete |
-| AUTH-04 | Phase 1 | Complete |
-| AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Complete |
-| LGPD-01 | Phase 1 | Complete |
-| LGPD-02 | Phase 1 | Complete |
-| LGPD-03 | Phase 1 | Complete |
-| LGPD-04 | Phase 1 | Complete |
-| WHATS-01 | Phase 2 | Pending |
-| WHATS-02 | Phase 2 | Pending |
-| WHATS-03 | Phase 2 | Pending |
-| WHATS-04 | Phase 2 | Pending |
-| WHATS-05 | Phase 2 | Pending |
-| WHATS-06 | Phase 2 | Pending |
-| WHATS-07 | Phase 2 | Pending |
-| AGENT-01 | Phase 2 | Pending |
-| AGENT-02 | Phase 2 | Pending |
-| AGENT-03 | Phase 2 | Pending |
-| AGENT-04 | Phase 2 | Complete |
-| AGENT-05 | Phase 2 | Complete |
-| AGENT-06 | Phase 2 | Complete |
-| AGENT-07 | Phase 2 | Complete |
-| AGENT-08 | Phase 2 | Complete |
-| AGENT-09 | Phase 2 | Complete |
-| AGENT-10 | Phase 2 | Pending |
-| CRM-01 | Phase 3 | Pending |
-| CRM-02 | Phase 3 | Pending |
-| CRM-03 | Phase 3 | Pending |
-| CRM-04 | Phase 3 | Pending |
-| CRM-05 | Phase 3 | Pending |
-| CRM-06 | Phase 3 | Pending |
-| CRM-07 | Phase 3 | Pending |
-| HAND-01 | Phase 3 | Pending |
-| HAND-02 | Phase 3 | Pending |
-| HAND-03 | Phase 3 | Pending |
-| HAND-04 | Phase 3 | Pending |
-| SCHED-01 | Phase 3 | Pending |
-| SCHED-02 | Phase 3 | Pending |
-| SCHED-03 | Phase 3 | Pending |
-| SCHED-04 | Phase 3 | Pending |
-| SCHED-05 | Phase 3 | Pending |
-| SCHED-06 | Phase 3 | Pending |
-| SCHED-07 | Phase 3 | Pending |
-| DASH-01 | Phase 4 | Pending |
-| DASH-02 | Phase 4 | Pending |
-| DASH-03 | Phase 4 | Pending |
-| DASH-04 | Phase 4 | Pending |
-| DASH-05 | Phase 4 | Pending |
-| DASH-06 | Phase 4 | Pending |
-| DASH-07 | Phase 4 | Pending |
-| DASH-08 | Phase 4 | Pending |
-| DASH-09 | Phase 4 | Pending |
-| SET-01 | Phase 4 | Pending |
-| SET-02 | Phase 4 | Pending |
-| SET-03 | Phase 4 | Pending |
-| SET-04 | Phase 4 | Pending |
-| SET-05 | Phase 4 | Pending |
-| SET-06 | Phase 4 | Pending |
-| NOTIF-01 | Phase 5 | Pending |
-| NOTIF-02 | Phase 5 | Pending |
-| NOTIF-03 | Phase 5 | Pending |
-| NOTIF-04 | Phase 5 | Pending |
-| NOTIF-05 | Phase 5 | Pending |
-| FOLLOW-01 | Phase 5 | Pending |
-| FOLLOW-02 | Phase 5 | Pending |
-| FOLLOW-03 | Phase 5 | Pending |
-| FOLLOW-04 | Phase 5 | Pending |
-| HOOK-01 | Phase 5 | Pending |
-| HOOK-02 | Phase 5 | Pending |
-| HOOK-03 | Phase 5 | Pending |
-| HOOK-04 | Phase 5 | Pending |
+| THEME-01..04 | Phase 6 | Pending |
+| I18N-01..05 | Phase 6 | Pending |
+| RT-01..05 | Phase 7 | Pending |
+| ANAL-01..05 | Phase 8 | Pending |
+| PDF-01..05 | Phase 8 | Pending |
+| PAY-01..05 | Phase 9 | Pending |
+| INSTA-01..05 | Phase 10 | Pending |
+| VOICE-01..05 | Phase 11 | Pending |
+| MOB-01..05 | Phase 12 | Pending |
 
 **Coverage:**
-- v1 requirements: 77 total (recount from file — original estimate of 60 was incorrect)
-- Mapped to phases: 77
-- Unmapped: 0 ✓
+- v2.0 requirements: 39 total
+- Mapped to phases: 39
+- Unmapped: 0
 
 ---
-*Requirements defined: 2026-04-02*
-*Last updated: 2026-04-02 after roadmap creation — all requirements mapped*
+*Requirements defined: 2026-04-03*
+*Last updated: 2026-04-03 after v2.0 milestone definition*
