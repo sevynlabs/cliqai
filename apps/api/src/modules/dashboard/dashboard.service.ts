@@ -90,7 +90,7 @@ export class DashboardService {
   }
 
   async getAgentHealth(organizationId: string) {
-    const instance = await this.prisma.whatsAppInstance.findFirst({
+    const instance = await this.prisma.whatsappInstance.findFirst({
       where: { organizationId },
     });
 

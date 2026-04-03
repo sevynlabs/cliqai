@@ -22,6 +22,9 @@ import { SchedulingModule } from "./modules/scheduling/scheduling.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
 import { ConversationsModule } from "./modules/conversations/conversations.module";
 import { SettingsModule } from "./modules/settings/settings.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
+import { FollowupsModule } from "./modules/followups/followups.module";
+import { WebhooksModule } from "./modules/webhooks/webhooks.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -76,6 +79,9 @@ function validateEnv(config: Record<string, unknown>) {
     DashboardModule,
     ConversationsModule,
     SettingsModule,
+    NotificationsModule,
+    FollowupsModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [
