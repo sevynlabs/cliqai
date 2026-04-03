@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { ToastContainer } from "@/components/toast-container";
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +18,7 @@ import {
   X,
   Bot,
   ChevronRight,
+  Search,
 } from "lucide-react";
 
 interface BadgeCounts {
@@ -57,6 +59,69 @@ function useBadgeCounts(): BadgeCounts {
   }, [fetchCounts]);
 
   return counts;
+}
+
+function GlobalSearch() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<{ id: string; name: string | null; phone: string; stage: string }[]>([]);
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (query.length < 2) { setResults([]); return; }
+    const timer = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/leads/search?q=${encodeURIComponent(query)}`, { credentials: "include" });
+        if (r.ok) {
+          const data = await r.json();
+          setResults(Array.isArray(data) ? data.slice(0, 6) : []);
+        }
+      } catch { /* silent */ }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  return (
+    <div className="relative px-3 pt-1 pb-2">
+      <div className="relative">
+        <Search className="absolute left-3 top-2 h-3.5 w-3.5 text-gray-400" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 200)}
+          placeholder="Buscar leads..."
+          className="w-full rounded-lg bg-gray-50 border-0 py-2 pl-9 pr-3 text-xs text-gray-700 placeholder:text-gray-400 focus:bg-white focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all"
+        />
+      </div>
+      {open && results.length > 0 && (
+        <div className="absolute left-3 right-3 top-full mt-1 z-50 rounded-xl bg-white border border-border/60 shadow-lg overflow-hidden">
+          {results.map((lead) => (
+            <button
+              key={lead.id}
+              onMouseDown={() => {
+                setQuery("");
+                setOpen(false);
+                router.push(`/dashboard/crm`);
+              }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 flex-shrink-0">
+                <Users className="h-3 w-3 text-gray-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-gray-900 truncate">
+                  {lead.name || lead.phone}
+                </p>
+                <p className="text-[10px] text-gray-400">{lead.stage} · {lead.phone}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const NAV_ITEMS = [
@@ -136,6 +201,9 @@ export default function DashboardLayout({
               <X className="h-5 w-5" />
             </button>
           </div>
+
+          {/* Search */}
+          <GlobalSearch />
 
           {/* Navigation */}
           <nav className="flex-1 space-y-0.5 px-3 pt-2">
@@ -225,6 +293,8 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

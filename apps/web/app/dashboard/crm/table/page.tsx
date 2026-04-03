@@ -24,6 +24,7 @@ import {
   ChevronRight,
   ArrowUpDown,
   Search,
+  Download,
 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -110,20 +111,45 @@ const columns: ColumnDef<Lead>[] = [
   },
 ];
 
+function exportCSV(leads: Lead[]) {
+  const headers = ["Nome", "Telefone", "Procedimento", "Estagio", "Score", "Fonte", "Criado em"];
+  const rows = leads.map((l) => [
+    l.name ?? "",
+    l.phone,
+    l.procedureInterest ?? "",
+    l.stage,
+    String(l.score),
+    l.source ?? "",
+    new Date(l.createdAt).toLocaleDateString("pt-BR"),
+  ]);
+  const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `leads-${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function TableView() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [search, setSearch] = useState("");
+  const [stageFilter, setStageFilter] = useState("");
+  const [sourceFilter, setSourceFilter] = useState("");
   const [selectedLead, setSelectedLead] = useState<string | null>(null);
   const { data: leads = [], isLoading } = useLeads();
 
-  const filteredLeads = search
-    ? leads.filter(
-        (l: Lead) =>
-          l.name?.toLowerCase().includes(search.toLowerCase()) ||
-          l.phone.includes(search) ||
-          l.procedureInterest?.toLowerCase().includes(search.toLowerCase()),
-      )
-    : leads;
+  const filteredLeads = leads.filter((l: Lead) => {
+    if (search && !(
+      l.name?.toLowerCase().includes(search.toLowerCase()) ||
+      l.phone.includes(search) ||
+      l.procedureInterest?.toLowerCase().includes(search.toLowerCase())
+    )) return false;
+    if (stageFilter && l.stage !== stageFilter) return false;
+    if (sourceFilter && l.source !== sourceFilter) return false;
+    return true;
+  });
 
   const table = useReactTable({
     data: filteredLeads,
@@ -151,8 +177,8 @@ function TableView() {
 
   return (
     <div>
-      <div className="mb-5">
-        <div className="relative max-w-sm">
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
           <input
             type="text"
@@ -162,6 +188,37 @@ function TableView() {
             className="input-base pl-10"
           />
         </div>
+        <select
+          value={stageFilter}
+          onChange={(e) => setStageFilter(e.target.value)}
+          className="input-base w-auto text-xs"
+        >
+          <option value="">Todos estagios</option>
+          <option value="novo">Novo</option>
+          <option value="qualificado">Qualificado</option>
+          <option value="agendado">Agendado</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="atendido">Atendido</option>
+          <option value="perdido">Perdido</option>
+        </select>
+        <select
+          value={sourceFilter}
+          onChange={(e) => setSourceFilter(e.target.value)}
+          className="input-base w-auto text-xs"
+        >
+          <option value="">Todas fontes</option>
+          {[...new Set(leads.map((l: Lead) => l.source).filter(Boolean))].map((src) => (
+            <option key={src!} value={src!}>{src}</option>
+          ))}
+        </select>
+        <button
+          onClick={() => exportCSV(filteredLeads)}
+          disabled={filteredLeads.length === 0}
+          className="btn-secondary text-xs gap-1.5 ml-auto"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Exportar CSV
+        </button>
       </div>
 
       <div className="card overflow-hidden">
