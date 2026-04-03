@@ -11,7 +11,11 @@ interface AgentHealth {
 export function AgentHealthIndicator() {
   const { data, isLoading } = useQuery<AgentHealth>({
     queryKey: ["dashboard", "agent-health"],
-    queryFn: () => fetch("/api/dashboard/agent-health", { credentials: "include" }).then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/dashboard/agent-health", { credentials: "include" });
+      if (!r.ok) return { connected: false, instanceName: null, status: "disconnected" };
+      return r.json();
+    },
     refetchInterval: 10_000,
   });
 

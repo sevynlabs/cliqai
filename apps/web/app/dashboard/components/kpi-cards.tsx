@@ -19,7 +19,11 @@ const cards = [
 export function KpiCards() {
   const { data, isLoading } = useQuery<Kpis>({
     queryKey: ["dashboard", "kpis"],
-    queryFn: () => fetch("/api/dashboard/kpis", { credentials: "include" }).then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/dashboard/kpis", { credentials: "include" });
+      if (!r.ok) return { leadsToday: 0, appointmentsToday: 0, conversionRate: 0, totalLeads30d: 0 };
+      return r.json();
+    },
     refetchInterval: 30_000,
   });
 

@@ -24,7 +24,11 @@ const eventIcons: Record<string, string> = {
 export function ActivityTimeline() {
   const { data, isLoading } = useQuery<Activity[]>({
     queryKey: ["dashboard", "activity"],
-    queryFn: () => fetch("/api/dashboard/activity", { credentials: "include" }).then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/dashboard/activity", { credentials: "include" });
+      if (!r.ok) return [];
+      return r.json();
+    },
     refetchInterval: 15_000,
   });
 

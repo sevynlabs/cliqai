@@ -28,7 +28,11 @@ const stageColors: Record<string, string> = {
 export function ConversionFunnel() {
   const { data, isLoading } = useQuery<FunnelStage[]>({
     queryKey: ["dashboard", "funnel"],
-    queryFn: () => fetch("/api/dashboard/funnel", { credentials: "include" }).then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/dashboard/funnel", { credentials: "include" });
+      if (!r.ok) return [];
+      return r.json();
+    },
   });
 
   const maxCount = Math.max(...(data?.map((d) => d.count) ?? [1]), 1);

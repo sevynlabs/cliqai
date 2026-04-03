@@ -22,7 +22,11 @@ const statusBadge: Record<string, string> = {
 export function TodaysAgenda() {
   const { data, isLoading } = useQuery<Appointment[]>({
     queryKey: ["dashboard", "agenda"],
-    queryFn: () => fetch("/api/dashboard/agenda", { credentials: "include" }).then((r) => r.json()),
+    queryFn: async () => {
+      const r = await fetch("/api/dashboard/agenda", { credentials: "include" });
+      if (!r.ok) return [];
+      return r.json();
+    },
     refetchInterval: 60_000,
   });
 

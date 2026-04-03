@@ -15,6 +15,7 @@ import {
   type AuthUser,
 } from "../../common/auth/current-user.decorator";
 import { MinRole } from "../../common/auth/rbac.guard";
+import { Public } from "../../common/tenant/public.decorator";
 
 @Controller("tenants")
 export class TenantsController {
@@ -27,6 +28,7 @@ export class TenantsController {
    * POST /api/tenants - Create a new clinic (organization).
    * Called during signup flow after user creation.
    */
+  @Public()
   @Post()
   async createClinic(
     @Body() dto: CreateClinicDto,
