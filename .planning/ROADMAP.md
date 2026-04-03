@@ -80,12 +80,12 @@ Plans:
   3. Clinic owner can update the AI agent persona (name, tone, scripts) and the change takes effect on the next conversation
   4. Admin can add a professional, set their working hours and Google Calendar, and the agent immediately respects the new availability
   5. Dashboard is usable on a phone — all key actions reachable without horizontal scroll
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Dashboard UI (KPI cards, funnel chart, activity timeline, today's agenda, agent health indicator)
-- [ ] 04-02: Conversation + CRM views (inbox, chat thread, Kanban, lead card, calendar view)
-- [ ] 04-03: Settings pages (clinic profile, agent config, procedures CRUD, professionals CRUD, notification/follow-up template editors)
+- [ ] 04-01-PLAN.md — Dashboard UI (KPI cards, funnel chart, activity timeline, today's agenda, agent health, sidebar nav)
+- [ ] 04-02-PLAN.md — Conversation inbox (three-panel: inbox list, chat thread, lead side panel) + Calendar view (month/week/day)
+- [ ] 04-03-PLAN.md — Settings pages (clinic profile, agent config, procedures CRUD, professionals CRUD, template editors)
 
 ### Phase 5: Notifications + Follow-ups + Webhooks
 **Goal**: The system automatically sends appointment confirmations, reminders, and follow-up sequences — and connects to external lead sources and downstream integrations via webhooks
