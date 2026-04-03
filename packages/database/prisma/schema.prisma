@@ -111,6 +111,11 @@ model Organization {
   calendarTokens CalendarToken[]
   appointments   Appointment[]
 
+  // Clinic configuration
+  procedures       Procedure[]
+  professionals    Professional[]
+  messageTemplates MessageTemplate[]
+
   @@unique([slug])
   @@map("organization")
 }
@@ -359,4 +364,57 @@ model Appointment {
   @@index([organizationId, startAt])
   @@index([leadId])
   @@map("appointments")
+}
+
+// ─── Clinic Configuration ───
+
+model Procedure {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id")
+  name           String
+  durationMinutes Int         @default(60) @map("duration_minutes")
+  price          Decimal?     @db.Decimal(10, 2)
+  description    String?
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("procedures")
+}
+
+model Professional {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id")
+  name           String
+  specialty      String?
+  calendarId     String?      @map("calendar_id")
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("professionals")
+}
+
+model MessageTemplate {
+  id             String       @id @default(uuid()) @db.Uuid
+  organizationId String       @map("organization_id")
+  type           String       // confirmation, reminder_24h, reminder_1h, noshow_recovery, followup
+  name           String
+  content        String
+  variables      String[]     @default([]) // e.g. ["patientName", "procedureName", "dateTime"]
+  active         Boolean      @default(true)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, type, name])
+  @@index([organizationId])
+  @@map("message_templates")
 }

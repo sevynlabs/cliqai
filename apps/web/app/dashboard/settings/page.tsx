@@ -31,6 +31,11 @@ import {
   Users,
   Mail,
   Shield,
+  Stethoscope,
+  UserCog,
+  FileText,
+  Plus,
+  DollarSign,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -588,10 +593,272 @@ function WebhookSettings() {
   );
 }
 
+/* ─── Procedures Tab ─── */
+function ProceduresSettings() {
+  const qc = useQueryClient();
+  const { data: procedures = [], isLoading } = useQuery<{ id: string; name: string; durationMinutes: number; price: number | null; description: string | null; active: boolean }[]>({
+    queryKey: ["procedures"],
+    queryFn: () => safeFetch("/api/settings/procedures", []),
+  });
+
+  const [name, setName] = useState("");
+  const [duration, setDuration] = useState("60");
+  const [price, setPrice] = useState("");
+
+  const create = useMutation({
+    mutationFn: (data: { name: string; durationMinutes: number; price?: number }) =>
+      fetch("/api/settings/procedures", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["procedures"] }); setName(""); setPrice(""); },
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/settings/procedures/${id}`, { method: "DELETE", credentials: "include" }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["procedures"] }),
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="card p-5 space-y-3">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-gray-400" />
+          Novo Procedimento
+        </h4>
+        <div className="grid grid-cols-3 gap-2">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome" className="input-base text-xs col-span-1" />
+          <div className="relative">
+            <Clock className="absolute left-3 top-2 h-3.5 w-3.5 text-gray-400" />
+            <input value={duration} onChange={(e) => setDuration(e.target.value)} type="number" placeholder="Min" className="input-base text-xs pl-9" />
+          </div>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-2 h-3.5 w-3.5 text-gray-400" />
+            <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" placeholder="Preco" className="input-base text-xs pl-9" />
+          </div>
+        </div>
+        <button
+          onClick={() => create.mutate({ name, durationMinutes: parseInt(duration) || 60, price: price ? parseFloat(price) : undefined })}
+          disabled={!name.trim() || create.isPending}
+          className="btn-primary text-xs"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Adicionar
+        </button>
+      </div>
+
+      <div className="card p-5 space-y-2">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Stethoscope className="h-4 w-4 text-gray-400" />
+          Procedimentos ({procedures.length})
+        </h4>
+        {isLoading ? <div className="skeleton h-20 w-full" /> : (
+          <div className="divide-y divide-border/40">
+            {procedures.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 py-2.5">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                  <p className="text-xs text-gray-400">{p.durationMinutes}min {p.price ? `· R$ ${p.price}` : ""}</p>
+                </div>
+                <button onClick={() => remove.mutate(p.id)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+            {procedures.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Nenhum procedimento</p>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Professionals Tab ─── */
+function ProfessionalsSettings() {
+  const qc = useQueryClient();
+  const { data: professionals = [], isLoading } = useQuery<{ id: string; name: string; specialty: string | null; active: boolean }[]>({
+    queryKey: ["professionals"],
+    queryFn: () => safeFetch("/api/settings/professionals", []),
+  });
+
+  const [name, setName] = useState("");
+  const [specialty, setSpecialty] = useState("");
+
+  const create = useMutation({
+    mutationFn: (data: { name: string; specialty?: string }) =>
+      fetch("/api/settings/professionals", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["professionals"] }); setName(""); setSpecialty(""); },
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/settings/professionals/${id}`, { method: "DELETE", credentials: "include" }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["professionals"] }),
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="card p-5 space-y-3">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-gray-400" />
+          Novo Profissional
+        </h4>
+        <div className="grid grid-cols-2 gap-2">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome completo" className="input-base text-xs" />
+          <input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="Especialidade" className="input-base text-xs" />
+        </div>
+        <button
+          onClick={() => create.mutate({ name, specialty: specialty || undefined })}
+          disabled={!name.trim() || create.isPending}
+          className="btn-primary text-xs"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Adicionar
+        </button>
+      </div>
+
+      <div className="card p-5 space-y-2">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <UserCog className="h-4 w-4 text-gray-400" />
+          Profissionais ({professionals.length})
+        </h4>
+        {isLoading ? <div className="skeleton h-20 w-full" /> : (
+          <div className="divide-y divide-border/40">
+            {professionals.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 py-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+                  <User className="h-3.5 w-3.5 text-gray-500" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                  {p.specialty && <p className="text-xs text-gray-400">{p.specialty}</p>}
+                </div>
+                <button onClick={() => remove.mutate(p.id)} className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+            {professionals.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Nenhum profissional</p>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Templates Tab ─── */
+function TemplatesSettings() {
+  const qc = useQueryClient();
+  const { data: templates = [], isLoading } = useQuery<{ id: string; type: string; name: string; content: string; variables: string[]; active: boolean }[]>({
+    queryKey: ["templates"],
+    queryFn: () => safeFetch("/api/settings/templates", []),
+  });
+
+  const [type, setType] = useState("confirmation");
+  const [tplName, setTplName] = useState("");
+  const [content, setContent] = useState("");
+
+  const create = useMutation({
+    mutationFn: (data: { type: string; name: string; content: string }) =>
+      fetch("/api/settings/templates", {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["templates"] }); setTplName(""); setContent(""); },
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) =>
+      fetch(`/api/settings/templates/${id}`, { method: "DELETE", credentials: "include" }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["templates"] }),
+  });
+
+  const typeLabels: Record<string, string> = {
+    confirmation: "Confirmacao",
+    reminder_24h: "Lembrete 24h",
+    reminder_1h: "Lembrete 1h",
+    noshow_recovery: "No-show",
+    followup: "Follow-up",
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="card p-5 space-y-3">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Plus className="h-4 w-4 text-gray-400" />
+          Novo Template
+        </h4>
+        <div className="grid grid-cols-2 gap-2">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="input-base text-xs">
+            <option value="confirmation">Confirmacao</option>
+            <option value="reminder_24h">Lembrete 24h</option>
+            <option value="reminder_1h">Lembrete 1h</option>
+            <option value="noshow_recovery">No-show Recovery</option>
+            <option value="followup">Follow-up</option>
+          </select>
+          <input value={tplName} onChange={(e) => setTplName(e.target.value)} placeholder="Nome do template" className="input-base text-xs" />
+        </div>
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={3}
+          placeholder="Ola {{patientName}}, sua consulta de {{procedureName}} esta confirmada para {{dateTime}}."
+          className="input-base text-xs resize-none"
+        />
+        <p className="text-[10px] text-gray-400">
+          Variaveis: {`{{patientName}}, {{procedureName}}, {{dateTime}}, {{clinicName}}`}
+        </p>
+        <button
+          onClick={() => create.mutate({ type, name: tplName, content })}
+          disabled={!tplName.trim() || !content.trim() || create.isPending}
+          className="btn-primary text-xs"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Adicionar
+        </button>
+      </div>
+
+      <div className="card p-5 space-y-2">
+        <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <FileText className="h-4 w-4 text-gray-400" />
+          Templates ({templates.length})
+        </h4>
+        {isLoading ? <div className="skeleton h-20 w-full" /> : (
+          <div className="divide-y divide-border/40">
+            {templates.map((t) => (
+              <div key={t.id} className="py-2.5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="badge bg-gray-100 text-gray-600 text-[10px]">{typeLabels[t.type] ?? t.type}</span>
+                  <span className="text-sm font-medium text-gray-900">{t.name}</span>
+                  <button onClick={() => remove.mutate(t.id)} className="ml-auto rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 line-clamp-2">{t.content}</p>
+              </div>
+            ))}
+            {templates.length === 0 && <p className="text-xs text-gray-400 text-center py-4">Nenhum template</p>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Tabs Layout ─── */
 const TABS: { id: string; label: string; icon: LucideIcon }[] = [
   { id: "agent", label: "Agente IA", icon: Bot },
   { id: "clinic", label: "Clinica", icon: Building2 },
+  { id: "procedures", label: "Procedimentos", icon: Stethoscope },
+  { id: "professionals", label: "Profissionais", icon: UserCog },
+  { id: "templates", label: "Templates", icon: FileText },
   { id: "whatsapp", label: "WhatsApp", icon: Smartphone },
   { id: "calendar", label: "Calendario", icon: Calendar },
   { id: "webhooks", label: "Webhooks", icon: Globe },
@@ -607,7 +874,7 @@ function SettingsContent() {
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-1 mb-6 border-b border-border/60 -mx-1">
+      <div className="flex gap-1 mb-6 border-b border-border/60 -mx-1 overflow-x-auto scrollbar-none">
         {TABS.map((t) => {
           const active = tab === t.id;
           return (
@@ -629,6 +896,9 @@ function SettingsContent() {
 
       {tab === "agent" && <AgentConfigForm />}
       {tab === "clinic" && <ClinicSettings />}
+      {tab === "procedures" && <ProceduresSettings />}
+      {tab === "professionals" && <ProfessionalsSettings />}
+      {tab === "templates" && <TemplatesSettings />}
       {tab === "whatsapp" && <WhatsAppSettings />}
       {tab === "calendar" && <CalendarSettings />}
       {tab === "webhooks" && <WebhookSettings />}

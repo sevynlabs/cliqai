@@ -10,11 +10,11 @@ CliniqAI is built in five phases, each delivering a complete vertical slice. Pha
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation** - Multi-tenant infrastructure, auth, RBAC, and LGPD compliance schema
-- [ ] **Phase 2: WhatsApp + AI Agent** - Evolution API integration and LangGraph SDR state machine
-- [ ] **Phase 3: CRM + Handoff + Scheduling** - Lead pipeline, human takeover, and Google Calendar booking
-- [ ] **Phase 4: Dashboard + Settings** - Management UI, KPI views, and clinic configuration
-- [ ] **Phase 5: Notifications + Follow-ups + Webhooks** - Automated engagement and external integrations
+- [x] **Phase 1: Foundation** - Multi-tenant infrastructure, auth, RBAC, and LGPD compliance schema
+- [x] **Phase 2: WhatsApp + AI Agent** - Evolution API integration and LangGraph SDR state machine
+- [x] **Phase 3: CRM + Handoff + Scheduling** - Lead pipeline, human takeover, and Google Calendar booking
+- [x] **Phase 4: Dashboard + Settings** - Management UI, KPI views, and clinic configuration
+- [x] **Phase 5: Notifications + Follow-ups + Webhooks** - Automated engagement and external integrations
 
 ## Phase Details
 
@@ -113,6 +113,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-04-02 |
 | 2. WhatsApp + AI Agent | 3/3 | Complete | 2026-04-02 |
-| 3. CRM + Handoff + Scheduling | 1/3 | In progress | - |
-| 4. Dashboard + Settings | 0/3 | Not started | - |
-| 5. Notifications + Follow-ups + Webhooks | 0/3 | Not started | - |
+| 3. CRM + Handoff + Scheduling | 3/3 | Complete | 2026-04-03 |
+| 4. Dashboard + Settings | 3/3 | Complete | 2026-04-03 |
+| 5. Notifications + Follow-ups + Webhooks | 3/3 | Complete | 2026-04-03 |
