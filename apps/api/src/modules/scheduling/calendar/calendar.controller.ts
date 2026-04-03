@@ -12,6 +12,16 @@ export class CalendarController {
     private readonly cls: ClsService,
   ) {}
 
+  @Get("status")
+  async getStatus() {
+    const organizationId = this.cls.get("tenantId");
+    const token = await this.calendarService.getTokenForOrg(organizationId);
+    return {
+      connected: !!token,
+      calendarId: token?.calendarId ?? null,
+    };
+  }
+
   @Get("auth")
   getAuthUrl(@Query("professionalId") professionalId?: string) {
     const organizationId = this.cls.get("tenantId");

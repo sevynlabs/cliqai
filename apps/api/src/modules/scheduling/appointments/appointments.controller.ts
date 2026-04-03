@@ -5,14 +5,17 @@ import {
   Param,
   Query,
   Body,
+  BadRequestException,
 } from "@nestjs/common";
 import { ClsService } from "nestjs-cls";
 import { AppointmentsService } from "./appointments.service";
+import { CalendarService } from "../calendar/calendar.service";
 
 @Controller("appointments")
 export class AppointmentsController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
+    private readonly calendarService: CalendarService,
     private readonly cls: ClsService,
   ) {}
 
@@ -47,9 +50,31 @@ export class AppointmentsController {
     @Param("id") id: string,
     @Body() body: { startISO: string; endISO: string },
   ) {
+    if (!body.startISO || !body.endISO) {
+      throw new BadRequestException("startISO and endISO are required");
+    }
+
     const organizationId = this.cls.get("tenantId");
-    await this.appointmentsService.cancelAppointment(id, organizationId);
-    // Re-booking would need full params — simplified for now
-    return { success: true, message: "Appointment cancelled. New booking needed." };
+    const token = await this.calendarService.getTokenForOrg(organizationId);
+
+    // Cancel old appointment
+    const cancelled = await this.appointmentsService.cancelAppointment(id, organizationId);
+
+    if (!cancelled.leadId || !token) {
+      return { success: true, message: "Cancelled but could not rebook (no calendar token)." };
+    }
+
+    // Rebook with same lead
+    const newAppt = await this.appointmentsService.bookSlot({
+      organizationId,
+      leadId: cancelled.leadId,
+      calendarId: token.calendarId,
+      refreshToken: token.refreshToken,
+      startISO: body.startISO,
+      endISO: body.endISO,
+      procedureName: cancelled.procedureName ?? undefined,
+    });
+
+    return { success: true, appointment: newAppt };
   }
 }

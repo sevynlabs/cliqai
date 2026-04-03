@@ -100,4 +100,47 @@ export class DashboardService {
       status: instance?.status ?? "disconnected",
     };
   }
+
+  async getLeadAnalytics(organizationId: string) {
+    const leads = await this.prisma.lead.findMany({
+      where: { organizationId },
+      select: { source: true, score: true, procedureInterest: true },
+    });
+
+    // By source
+    const bySource: Record<string, number> = {};
+    for (const l of leads) {
+      const src = l.source || "direto";
+      bySource[src] = (bySource[src] || 0) + 1;
+    }
+
+    // Score distribution
+    const scoreRanges = { alto: 0, medio: 0, baixo: 0 };
+    for (const l of leads) {
+      if (l.score >= 70) scoreRanges.alto++;
+      else if (l.score >= 40) scoreRanges.medio++;
+      else scoreRanges.baixo++;
+    }
+
+    // Top procedures
+    const byProcedure: Record<string, number> = {};
+    for (const l of leads) {
+      if (l.procedureInterest) {
+        byProcedure[l.procedureInterest] = (byProcedure[l.procedureInterest] || 0) + 1;
+      }
+    }
+
+    return {
+      totalLeads: leads.length,
+      bySource: Object.entries(bySource)
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8),
+      scoreDistribution: scoreRanges,
+      topProcedures: Object.entries(byProcedure)
+        .map(([procedure, count]) => ({ procedure, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6),
+    };
+  }
 }

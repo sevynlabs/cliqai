@@ -1,21 +1,25 @@
 import {
   Controller,
   Get,
+  Post,
   Param,
   Patch,
   Query,
   Body,
+  Req,
   UnauthorizedException,
 } from "@nestjs/common";
 import { ClsService } from "nestjs-cls";
 import { OrgRoles } from "@thallesp/nestjs-better-auth";
 import { LeadsService } from "./leads.service";
+import { AnnotationsService } from "../annotations/annotations.service";
 import { UpdateStageDto } from "./dto/update-stage.dto";
 
 @Controller("leads")
 export class LeadsController {
   constructor(
     private readonly leadsService: LeadsService,
+    private readonly annotationsService: AnnotationsService,
     private readonly cls: ClsService,
   ) {}
 
@@ -90,5 +94,24 @@ export class LeadsController {
   ) {
     const tenantId = this.getTenantId();
     return this.leadsService.updateStage(id, tenantId, dto.stage);
+  }
+
+  /**
+   * POST /api/leads/:id/annotations - Create manual annotation.
+   */
+  @Post(":id/annotations")
+  @OrgRoles(["owner", "admin", "manager", "attendant"])
+  async createAnnotation(
+    @Param("id") id: string,
+    @Body() body: { type: string; content: string },
+    @Req() req: any,
+  ) {
+    const userId = req.user?.id ?? "manual";
+    return this.annotationsService.createManual(
+      id,
+      userId,
+      body.type || "note",
+      body.content,
+    );
   }
 }

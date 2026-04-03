@@ -424,26 +424,45 @@ function WhatsAppSettings() {
 
 /* ─── Calendar Tab ─── */
 function CalendarSettings() {
+  const { data: calStatus, isLoading } = useQuery<{ connected: boolean; calendarId: string | null }>({
+    queryKey: ["calendar", "status"],
+    queryFn: () => safeFetch("/api/calendar/status", { connected: false, calendarId: null }),
+  });
+
+  const connected = calStatus?.connected ?? false;
+
+  if (isLoading) {
+    return <div className="skeleton h-32 w-full rounded-xl" />;
+  }
+
   return (
     <div className="space-y-6">
-      <div className="card p-5">
+      <div className={`card p-5 ${connected ? "ring-1 ring-blue-200" : ""}`}>
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
-            <Calendar className="h-5 w-5 text-blue-600" />
+          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${connected ? "bg-blue-100" : "bg-gray-100"}`}>
+            <Calendar className={`h-5 w-5 ${connected ? "text-blue-600" : "text-gray-400"}`} />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">Google Calendar</p>
+            <p className={`text-sm font-semibold ${connected ? "text-blue-700" : "text-gray-900"}`}>
+              {connected ? "Google Calendar Conectado" : "Google Calendar"}
+            </p>
             <p className="text-xs text-gray-500">
-              Conecte sua conta Google para sincronizar agendamentos
+              {connected
+                ? `Calendario: ${calStatus?.calendarId ?? "primary"}`
+                : "Conecte sua conta Google para sincronizar agendamentos"}
             </p>
           </div>
-          <a
-            href="/api/calendar/auth"
-            className="btn-primary"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Conectar Google
-          </a>
+          {connected ? (
+            <span className="badge bg-blue-50 text-blue-700">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Conectado
+            </span>
+          ) : (
+            <a href="/api/calendar/auth" className="btn-primary">
+              <ExternalLink className="h-4 w-4" />
+              Conectar
+            </a>
+          )}
         </div>
       </div>
 

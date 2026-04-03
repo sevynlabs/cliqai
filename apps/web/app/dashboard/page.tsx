@@ -7,6 +7,7 @@ import { ActivityTimeline } from "./components/activity-timeline";
 import { TodaysAgenda } from "./components/todays-agenda";
 import { AgentHealthIndicator } from "./components/agent-health";
 import { OnboardingBanner } from "./components/onboarding-banner";
+import { LeadAnalytics } from "./components/lead-analytics";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,8 @@ export default function DashboardPage() {
           <ConversionFunnel />
           <TodaysAgenda />
         </div>
+
+        <LeadAnalytics />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2">

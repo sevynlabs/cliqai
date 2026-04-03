@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { fetchLead } from "../lib/api";
@@ -19,6 +20,8 @@ import {
   ArrowRight,
   CheckCircle2,
   XCircle,
+  Plus,
+  Send,
 } from "lucide-react";
 
 interface LeadDrawerProps {
@@ -48,6 +51,59 @@ function ScoreBadge({ score }: { score: number }) {
   else if (score >= 50) color = "bg-amber-50 text-amber-700";
   else if (score >= 25) color = "bg-orange-50 text-orange-700";
   return <span className={`badge text-sm font-bold tabular-nums ${color}`}>{score}</span>;
+}
+
+function AddAnnotationForm({ leadId }: { leadId: string }) {
+  const [content, setContent] = useState("");
+  const [type, setType] = useState("note");
+  const qc = useQueryClient();
+
+  const create = useMutation({
+    mutationFn: async () => {
+      const r = await fetch(`/api/leads/${leadId}/annotations`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, content }),
+      });
+      if (!r.ok) throw new Error("Failed");
+    },
+    onSuccess: () => {
+      setContent("");
+      qc.invalidateQueries({ queryKey: ["lead", leadId] });
+    },
+  });
+
+  return (
+    <div className="card p-3 space-y-2">
+      <div className="flex gap-2">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="input-base text-xs py-1.5 w-auto"
+        >
+          <option value="note">Nota</option>
+          <option value="summary">Resumo</option>
+          <option value="objection">Objecao</option>
+          <option value="next_steps">Proximo Passo</option>
+        </select>
+        <input
+          type="text"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Escreva uma anotacao..."
+          className="input-base text-xs py-1.5 flex-1"
+        />
+        <button
+          onClick={() => create.mutate()}
+          disabled={create.isPending || !content.trim()}
+          className="btn-primary text-xs px-2.5 py-1.5"
+        >
+          <Send className="h-3 w-3" />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export function LeadDrawer({ leadId, onClose }: LeadDrawerProps) {
@@ -181,12 +237,15 @@ export function LeadDrawer({ leadId, onClose }: LeadDrawerProps) {
             )}
 
             {/* Annotations */}
-            {lead.annotations.length > 0 && (
-              <div>
-                <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 px-1">
+            <div>
+              <div className="flex items-center justify-between mb-3 px-1">
+                <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   <Bot className="h-3.5 w-3.5" />
                   Anotacoes ({lead.annotations.length})
                 </h4>
+              </div>
+              <AddAnnotationForm leadId={leadId} />
+              {lead.annotations.length > 0 && (
                 <div className="space-y-2">
                   {lead.annotations.map((ann) => {
                     const Icon = annotationIcon[ann.type] ?? FileText;
@@ -211,8 +270,8 @@ export function LeadDrawer({ leadId, onClose }: LeadDrawerProps) {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Timeline */}
             {lead.timeline.length > 0 && (

@@ -33,4 +33,9 @@ export class DashboardController {
   getAgentHealth() {
     return this.dashboardService.getAgentHealth(this.cls.get("tenantId"));
   }
+
+  @Get("lead-analytics")
+  getLeadAnalytics() {
+    return this.dashboardService.getLeadAnalytics(this.cls.get("tenantId"));
+  }
 }
