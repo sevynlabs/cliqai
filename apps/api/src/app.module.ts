@@ -19,6 +19,9 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module";
 import { AgentModule } from "./modules/agent/agent.module";
 import { CrmModule } from "./modules/crm/crm.module";
 import { SchedulingModule } from "./modules/scheduling/scheduling.module";
+import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { ConversationsModule } from "./modules/conversations/conversations.module";
+import { SettingsModule } from "./modules/settings/settings.module";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url().optional(),
@@ -70,6 +73,9 @@ function validateEnv(config: Record<string, unknown>) {
     AgentModule,
     CrmModule,
     SchedulingModule,
+    DashboardModule,
+    ConversationsModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [

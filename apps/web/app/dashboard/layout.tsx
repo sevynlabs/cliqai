@@ -55,13 +55,22 @@ export default function DashboardLayout({
           </span>
         </div>
         <nav className="mt-4 space-y-1 px-3">
-          <Link
-            href="/dashboard"
-            className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-          >
-            Dashboard
-          </Link>
-          {/* Phase 4 will add: Leads, Conversations, Calendar, Settings */}
+          {[
+            { href: "/dashboard", label: "Dashboard", icon: "📊" },
+            { href: "/dashboard/crm", label: "Leads", icon: "👤" },
+            { href: "/dashboard/conversations", label: "Conversas", icon: "💬" },
+            { href: "/dashboard/calendar", label: "Agenda", icon: "📅" },
+            { href: "/dashboard/settings", label: "Configuracoes", icon: "⚙️" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </aside>
 
