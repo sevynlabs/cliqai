@@ -46,6 +46,40 @@ export function updateLeadStage(
   });
 }
 
+export interface LeadAnnotation {
+  id: string;
+  type: string;
+  content: string;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+export interface LeadTimelineEvent {
+  id: string;
+  eventType: string;
+  description: string;
+  createdAt: string;
+}
+
+export interface LeadAppointment {
+  id: string;
+  startAt: string;
+  endAt: string;
+  status: string;
+  procedureName: string | null;
+}
+
+export interface LeadDetail extends Lead {
+  email: string | null;
+  annotations: LeadAnnotation[];
+  timeline: LeadTimelineEvent[];
+  appointments: LeadAppointment[];
+}
+
+export function fetchLead(id: string): Promise<LeadDetail> {
+  return apiFetch<LeadDetail>(`/api/leads/${id}`);
+}
+
 export function takeOverConversation(conversationId: string) {
   return apiFetch(`/api/handoff/${conversationId}/takeover`, { method: "POST" });
 }

@@ -3,13 +3,16 @@ import {
   Post,
   Get,
   Param,
+  Body,
   Req,
   HttpCode,
   HttpStatus,
   NotFoundException,
+  BadRequestException,
 } from "@nestjs/common";
 import { HandoffService } from "./handoff.service";
 import { PrismaService } from "../../../common/prisma/prisma.service";
+import { WhatsappService } from "../../whatsapp/whatsapp.service";
 import { ClsService } from "nestjs-cls";
 
 @Controller("handoff")
@@ -18,6 +21,7 @@ export class HandoffController {
     private readonly handoffService: HandoffService,
     private readonly prisma: PrismaService,
     private readonly cls: ClsService,
+    private readonly whatsappService: WhatsappService,
   ) {}
 
   @Post(":conversationId/takeover")
@@ -83,5 +87,37 @@ export class HandoffController {
       mutexHolder: holder,
       isHumanHandling: !!holder,
     };
+  }
+
+  @Post(":conversationId/send")
+  @HttpCode(HttpStatus.OK)
+  async sendMessage(
+    @Param("conversationId") conversationId: string,
+    @Body() body: { text: string },
+  ) {
+    if (!body.text?.trim()) {
+      throw new BadRequestException("text is required");
+    }
+
+    const organizationId = this.cls.get("tenantId");
+
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
+    if (!conversation || conversation.organizationId !== organizationId) {
+      throw new NotFoundException("Conversa nao encontrada");
+    }
+
+    if (conversation.status !== "human_handling") {
+      throw new BadRequestException("Conversa nao esta em modo humano");
+    }
+
+    await this.whatsappService.sendText(
+      organizationId,
+      conversation.remoteJid,
+      body.text.trim(),
+    );
+
+    return { success: true };
   }
 }

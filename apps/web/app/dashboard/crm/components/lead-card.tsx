@@ -8,16 +8,17 @@ import type { Lead } from "../lib/api";
 
 interface LeadCardProps {
   lead: Lead;
+  onSelect?: (id: string) => void;
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 75) return "bg-green-100 text-green-800";
-  if (score >= 50) return "bg-yellow-100 text-yellow-800";
-  if (score >= 25) return "bg-orange-100 text-orange-800";
-  return "bg-gray-100 text-gray-600";
+  if (score >= 75) return "bg-emerald-50 text-emerald-700";
+  if (score >= 50) return "bg-amber-50 text-amber-700";
+  if (score >= 25) return "bg-orange-50 text-orange-700";
+  return "bg-gray-50 text-gray-500";
 }
 
-export function LeadCard({ lead }: LeadCardProps) {
+export function LeadCard({ lead, onSelect }: LeadCardProps) {
   const {
     attributes,
     listeners,
@@ -39,32 +40,33 @@ export function LeadCard({ lead }: LeadCardProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
+      onClick={() => onSelect?.(lead.id)}
+      className="card-hover p-3 cursor-grab active:cursor-grabbing group"
     >
-      <div className="flex items-start justify-between mb-2">
-        <p className="font-medium text-sm text-gray-900 truncate">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <p className="text-[13px] font-medium text-gray-900 truncate leading-snug">
           {lead.name || lead.phone}
         </p>
-        <span
-          className={`text-xs font-semibold px-1.5 py-0.5 rounded ${getScoreColor(lead.score)}`}
-        >
+        <span className={`badge text-[11px] flex-shrink-0 ${getScoreColor(lead.score)}`}>
           {lead.score}
         </span>
       </div>
 
       {lead.procedureInterest && (
-        <p className="text-xs text-gray-500 mb-1 truncate">
+        <p className="text-xs text-gray-500 mb-2 truncate">
           {lead.procedureInterest}
         </p>
       )}
 
       <div className="flex items-center justify-between">
-        {lead.source && (
-          <span className="text-xs bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded">
+        {lead.source ? (
+          <span className="badge bg-primary/8 text-primary text-[10px]">
             {lead.source}
           </span>
+        ) : (
+          <span />
         )}
-        <span className="text-xs text-gray-400">
+        <span className="text-[11px] text-gray-400 tabular-nums">
           {formatDistanceToNow(new Date(lead.createdAt), {
             addSuffix: true,
             locale: ptBR,

@@ -8,6 +8,7 @@ import type { LoginInput } from "@cliniq/shared";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -47,42 +48,58 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <div className="text-center mb-2">
+        <h2 className="font-heading text-xl font-bold text-gray-900">
+          Bem-vindo de volta
+        </h2>
+        <p className="mt-1 text-sm text-gray-400">
+          Entre na sua conta para continuar
+        </p>
+      </div>
+
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-xs font-medium text-gray-500 mb-1.5">
           Email
         </label>
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          {...register("email")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="seu@email.com"
-        />
+        <div className="relative">
+          <Mail className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register("email")}
+            className="input-base pl-10"
+            placeholder="seu@email.com"
+          />
+        </div>
         {errors.email && (
-          <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+          <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-xs font-medium text-gray-500 mb-1.5">
           Senha
         </label>
-        <input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          {...register("password")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="********"
-        />
+        <div className="relative">
+          <Lock className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            {...register("password")}
+            className="input-base pl-10"
+            placeholder="********"
+          />
+        </div>
         {errors.password && (
-          <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+          <p className="mt-1.5 text-xs text-red-500">{errors.password.message}</p>
         )}
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
           {error}
         </div>
       )}
@@ -90,16 +107,17 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+        className="btn-primary w-full"
       >
         {loading ? "Entrando..." : "Entrar"}
+        {!loading && <ArrowRight className="h-4 w-4" />}
       </button>
 
-      <div className="flex items-center justify-between text-sm">
-        <Link href="/forgot-password" className="text-primary hover:text-primary-dark">
+      <div className="flex items-center justify-between text-[13px]">
+        <Link href="/forgot-password" className="text-gray-400 hover:text-gray-700 transition-colors">
           Esqueceu a senha?
         </Link>
-        <Link href="/signup" className="text-primary hover:text-primary-dark">
+        <Link href="/signup" className="font-medium text-primary hover:text-primary-dark transition-colors">
           Criar conta
         </Link>
       </div>

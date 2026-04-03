@@ -1,8 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { safeFetch } from "@/lib/safe-fetch";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Calendar, Clock, User } from "lucide-react";
 
 interface Appointment {
   id: string;
@@ -13,52 +14,83 @@ interface Appointment {
   lead: { name: string | null; phone: string; procedureInterest: string | null } | null;
 }
 
-const statusBadge: Record<string, string> = {
-  tentative: "bg-yellow-100 text-yellow-700",
-  confirmed: "bg-green-100 text-green-700",
-  cancelled: "bg-red-100 text-red-700",
+const statusConfig: Record<string, { label: string; dot: string; badge: string }> = {
+  tentative: { label: "Pendente", dot: "bg-amber-400", badge: "bg-amber-50 text-amber-700" },
+  confirmed: { label: "Confirmado", dot: "bg-emerald-400", badge: "bg-emerald-50 text-emerald-700" },
+  cancelled: { label: "Cancelado", dot: "bg-red-400", badge: "bg-red-50 text-red-600" },
 };
 
 export function TodaysAgenda() {
   const { data, isLoading } = useQuery<Appointment[]>({
     queryKey: ["dashboard", "agenda"],
-    queryFn: async () => {
-      const r = await fetch("/api/dashboard/agenda", { credentials: "include" });
-      if (!r.ok) return [];
-      return r.json();
-    },
+    queryFn: () => safeFetch("/api/dashboard/agenda", []),
     refetchInterval: 60_000,
   });
 
+  const appointments = Array.isArray(data) ? data : [];
+
   return (
-    <div className="bg-white rounded-lg border p-4">
-      <h3 className="font-heading font-semibold text-gray-900 mb-4">Agenda de Hoje</h3>
+    <div className="card p-5">
+      <div className="flex items-center gap-2 mb-5">
+        <Calendar className="h-4 w-4 text-gray-400" strokeWidth={1.5} />
+        <h3 className="font-heading text-sm font-semibold text-gray-900">
+          Agenda de Hoje
+        </h3>
+        <span className="badge bg-primary/10 text-primary ml-auto">
+          {appointments.length} consultas
+        </span>
+      </div>
+
       {isLoading ? (
-        <div className="h-32 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600" />
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {(data ?? []).map((appt) => (
-            <div key={appt.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-              <div className="text-sm font-mono text-teal-700 font-semibold w-14 flex-shrink-0">
-                {format(new Date(appt.startAt), "HH:mm")}
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex gap-3">
+              <div className="skeleton h-10 w-14" />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton h-4 w-3/4" />
+                <div className="skeleton h-3 w-1/2" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {appt.lead?.name ?? appt.lead?.phone ?? "Paciente"}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
-                  {appt.procedureName ?? appt.lead?.procedureInterest ?? "Consulta"}
-                </p>
-              </div>
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusBadge[appt.status] ?? "bg-gray-100 text-gray-600"}`}>
-                {appt.status === "tentative" ? "Pendente" : appt.status === "confirmed" ? "Confirmado" : appt.status}
-              </span>
             </div>
           ))}
-          {(!data || data.length === 0) && (
-            <p className="text-sm text-gray-400 text-center py-6">Nenhum agendamento para hoje</p>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {appointments.map((appt) => {
+            const cfg = statusConfig[appt.status] ?? statusConfig.tentative;
+            return (
+              <div
+                key={appt.id}
+                className="flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-gray-50/80"
+              >
+                <div className="flex flex-col items-center justify-center w-14 flex-shrink-0 rounded-lg bg-gray-50 py-1.5">
+                  <Clock className="h-3 w-3 text-gray-300 mb-0.5" />
+                  <span className="text-xs font-bold tabular-nums text-gray-700">
+                    {format(new Date(appt.startAt), "HH:mm")}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <User className="h-3 w-3 text-gray-300 flex-shrink-0" />
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {appt.lead?.name ?? appt.lead?.phone ?? "Paciente"}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-400 truncate mt-0.5">
+                    {appt.procedureName ?? appt.lead?.procedureInterest ?? "Consulta"}
+                  </p>
+                </div>
+                <span className={`badge ${cfg.badge} flex-shrink-0`}>
+                  <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />
+                  {cfg.label}
+                </span>
+              </div>
+            );
+          })}
+          {appointments.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+              <Calendar className="h-8 w-8 mb-2 text-gray-200" strokeWidth={1} />
+              <p className="text-sm">Nenhum agendamento para hoje</p>
+            </div>
           )}
         </div>
       )}

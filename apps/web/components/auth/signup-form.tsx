@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { apiClient } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { User, Mail, Lock, Building2, ArrowRight, AlertCircle } from "lucide-react";
 
 export function SignupForm() {
   const router = useRouter();
@@ -28,7 +29,6 @@ export function SignupForm() {
     setLoading(true);
 
     try {
-      // Step 1: Create user account via Better Auth
       const signupResult = await authClient.signUp.email({
         email: data.email,
         password: data.password,
@@ -40,7 +40,6 @@ export function SignupForm() {
         return;
       }
 
-      // Step 2: Create clinic (organization) via API
       try {
         await apiClient.post("/api/tenants", {
           name: data.clinicName,
@@ -60,76 +59,90 @@ export function SignupForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="text-center mb-2">
+        <h2 className="font-heading text-xl font-bold text-gray-900">
+          Criar nova conta
+        </h2>
+        <p className="mt-1 text-sm text-gray-400">
+          Configure sua clinica em minutos
+        </p>
+      </div>
+
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-xs font-medium text-gray-500 mb-1.5">
           Seu nome
         </label>
-        <input
-          id="name"
-          type="text"
-          autoComplete="name"
-          {...register("name")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="Dr. Joao Silva"
-        />
-        {errors.name && (
-          <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
-        )}
+        <div className="relative">
+          <User className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="name"
+            type="text"
+            autoComplete="name"
+            {...register("name")}
+            className="input-base pl-10"
+            placeholder="Dr. Joao Silva"
+          />
+        </div>
+        {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-xs font-medium text-gray-500 mb-1.5">
           Email
         </label>
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          {...register("email")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="seu@email.com"
-        />
-        {errors.email && (
-          <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-        )}
+        <div className="relative">
+          <Mail className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register("email")}
+            className="input-base pl-10"
+            placeholder="seu@email.com"
+          />
+        </div>
+        {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-xs font-medium text-gray-500 mb-1.5">
           Senha
         </label>
-        <input
-          id="password"
-          type="password"
-          autoComplete="new-password"
-          {...register("password")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="Minimo 8 caracteres"
-        />
-        {errors.password && (
-          <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
-        )}
+        <div className="relative">
+          <Lock className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            {...register("password")}
+            className="input-base pl-10"
+            placeholder="Minimo 8 caracteres"
+          />
+        </div>
+        {errors.password && <p className="mt-1.5 text-xs text-red-500">{errors.password.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="clinicName" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="clinicName" className="block text-xs font-medium text-gray-500 mb-1.5">
           Nome da clinica
         </label>
-        <input
-          id="clinicName"
-          type="text"
-          {...register("clinicName")}
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-1 focus:ring-primary"
-          placeholder="Clinica Exemplo"
-        />
-        {errors.clinicName && (
-          <p className="mt-1 text-xs text-red-600">{errors.clinicName.message}</p>
-        )}
+        <div className="relative">
+          <Building2 className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            id="clinicName"
+            type="text"
+            {...register("clinicName")}
+            className="input-base pl-10"
+            placeholder="Clinica Exemplo"
+          />
+        </div>
+        {errors.clinicName && <p className="mt-1.5 text-xs text-red-500">{errors.clinicName.message}</p>}
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />
           {error}
         </div>
       )}
@@ -137,14 +150,15 @@ export function SignupForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+        className="btn-primary w-full"
       >
         {loading ? "Criando conta..." : "Criar conta"}
+        {!loading && <ArrowRight className="h-4 w-4" />}
       </button>
 
-      <p className="text-center text-sm text-gray-500">
+      <p className="text-center text-[13px] text-gray-400">
         Ja tem conta?{" "}
-        <Link href="/login" className="text-primary hover:text-primary-dark font-medium">
+        <Link href="/login" className="font-medium text-primary hover:text-primary-dark transition-colors">
           Entrar
         </Link>
       </p>

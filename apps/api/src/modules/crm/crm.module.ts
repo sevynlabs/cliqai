@@ -6,9 +6,10 @@ import { AnnotationsService } from "./annotations/annotations.service";
 import { HandoffService } from "./handoff/handoff.service";
 import { HandoffController } from "./handoff/handoff.controller";
 import { AgentModule } from "../agent/agent.module";
+import { WhatsappModule } from "../whatsapp/whatsapp.module";
 
 @Module({
-  imports: [forwardRef(() => AgentModule)],
+  imports: [forwardRef(() => AgentModule), forwardRef(() => WhatsappModule)],
   controllers: [LeadsController, HandoffController],
   providers: [LeadsService, PipelineService, AnnotationsService, HandoffService],
   exports: [LeadsService, PipelineService, AnnotationsService, HandoffService],

@@ -13,22 +13,25 @@ interface PipelineColumnProps {
   label: string;
   color: string;
   leads: Lead[];
+  onSelectLead?: (id: string) => void;
 }
 
-export function PipelineColumn({ id, label, color, leads }: PipelineColumnProps) {
+export function PipelineColumn({ id, label, color, leads, onSelectLead }: PipelineColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
     <div
       ref={setNodeRef}
-      className={`flex-shrink-0 w-72 rounded-lg ${isOver ? "bg-teal-50" : "bg-gray-50"} transition-colors`}
+      className={`flex-shrink-0 w-72 rounded-2xl transition-colors ${
+        isOver ? "bg-primary/5 ring-1 ring-primary/20" : "bg-gray-50/80"
+      }`}
     >
-      <div className="p-3 flex items-center gap-2">
-        <div className={`w-2.5 h-2.5 rounded-full ${color}`} />
-        <h3 className="font-heading font-semibold text-sm text-gray-700">
+      <div className="p-3 flex items-center gap-2.5">
+        <div className={`w-2 h-2 rounded-full ${color}`} />
+        <h3 className="font-heading text-[13px] font-semibold text-gray-700">
           {label}
         </h3>
-        <span className="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full ml-auto">
+        <span className="badge bg-white text-gray-500 shadow-sm ml-auto">
           {leads.length}
         </span>
       </div>
@@ -39,7 +42,7 @@ export function PipelineColumn({ id, label, color, leads }: PipelineColumnProps)
       >
         <div className="px-2 pb-2 space-y-2 min-h-[200px]">
           {leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} />
+            <LeadCard key={lead.id} lead={lead} onSelect={onSelectLead} />
           ))}
         </div>
       </SortableContext>

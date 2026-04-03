@@ -273,6 +273,45 @@ export class AgentService implements OnModuleInit {
   }
 
   /**
+   * Get messages from a conversation thread for display in the UI.
+   */
+  async getMessages(
+    threadId: string,
+  ): Promise<{ id: string; role: string; content: string; createdAt: string }[]> {
+    if (!this.compiledGraph) return [];
+
+    try {
+      const state = await this.compiledGraph.getState({
+        configurable: { thread_id: threadId },
+      });
+
+      if (!state?.values?.messages) return [];
+
+      return state.values.messages.map(
+        (msg: any, idx: number) => ({
+          id: msg.id ?? `msg-${idx}`,
+          role:
+            msg._getType?.() === "human"
+              ? "lead"
+              : msg._getType?.() === "ai"
+                ? "assistant"
+                : "system",
+          content:
+            typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg.content),
+          createdAt:
+            msg.response_metadata?.created_at ??
+            new Date().toISOString(),
+        }),
+      );
+    } catch (err: any) {
+      this.logger.warn(`Failed to get messages for thread ${threadId}: ${err.message}`);
+      return [];
+    }
+  }
+
+  /**
    * Return a conversation from human handling back to the AI agent.
    * For future human handoff return flow.
    */
