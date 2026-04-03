@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   QueryClient,
   QueryClientProvider,
@@ -578,7 +579,11 @@ const TABS: { id: string; label: string; icon: LucideIcon }[] = [
 ];
 
 function SettingsContent() {
-  const [tab, setTab] = useState("agent");
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState(() => {
+    const param = searchParams.get("tab");
+    return TABS.some((t) => t.id === param) ? param! : "agent";
+  });
 
   return (
     <div>
@@ -623,7 +628,9 @@ export default function SettingsPage() {
           <p className="mt-1 text-sm text-gray-500">Configure sua clinica e integrações</p>
         </div>
         <div className="card p-6">
-          <SettingsContent />
+          <Suspense fallback={<div className="skeleton h-64 w-full rounded-xl" />}>
+            <SettingsContent />
+          </Suspense>
         </div>
       </div>
     </QueryClientProvider>

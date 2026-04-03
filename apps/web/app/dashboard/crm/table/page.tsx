@@ -23,6 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
+  Search,
 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -111,11 +112,21 @@ const columns: ColumnDef<Lead>[] = [
 
 function TableView() {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [search, setSearch] = useState("");
   const [selectedLead, setSelectedLead] = useState<string | null>(null);
   const { data: leads = [], isLoading } = useLeads();
 
+  const filteredLeads = search
+    ? leads.filter(
+        (l: Lead) =>
+          l.name?.toLowerCase().includes(search.toLowerCase()) ||
+          l.phone.includes(search) ||
+          l.procedureInterest?.toLowerCase().includes(search.toLowerCase()),
+      )
+    : leads;
+
   const table = useReactTable({
-    data: leads,
+    data: filteredLeads,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -140,6 +151,19 @@ function TableView() {
 
   return (
     <div>
+      <div className="mb-5">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Buscar leads..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="input-base pl-10"
+          />
+        </div>
+      </div>
+
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -185,7 +209,7 @@ function TableView() {
       <div className="flex items-center justify-between mt-4 px-1">
         <span className="text-xs text-gray-400">
           Pagina {table.getState().pagination.pageIndex + 1} de{" "}
-          {table.getPageCount()} ({leads.length} leads)
+          {table.getPageCount()} ({filteredLeads.length} leads)
         </span>
         <div className="flex gap-1">
           <button
